@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '../')
+
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "studservice.settings")
 import django
