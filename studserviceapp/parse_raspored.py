@@ -53,7 +53,9 @@ def process_grupe(row,curr_semestar,offset):
 	grupe = row[offset+2].split(",")
 	ret_grupe = []
 	for grupa in grupe:
+		grupa = grupa.strip()
 		if(Grupa.objects.filter(oznaka_grupe = grupa).exists()):
+			ret_grupe.append(Grupa.objects.get(oznaka_grupe = grupa))
 			continue
 		print("Kreiranje {} grupe".format(grupa))
 		g = Grupa.objects.create(oznaka_grupe = grupa , semestar = curr_semestar)

@@ -10,10 +10,9 @@ from studserviceapp.models import Student, Grupa, Semestar, Nalog
 
 semestar = Semestar(vrsta='neparni', skolska_godina_pocetak=2018, skolska_godina_kraj=2019)
 semestar.save()
-g301 = Grupa(oznaka_grupe='301', smer='RN', semestar=semestar)
-g301.save()
-g302 = Grupa(oznaka_grupe='302', smer='RN', semestar=semestar)
-g302.save()
+
+g301 = Grupa.objects.get(oznaka_grupe='301')
+g302 = Grupa.objects.get(oznaka_grupe='302')
 
 lukaNalog = Nalog(username="ldjuric16", uloga="student")
 lukaNalog.save()
@@ -33,3 +32,4 @@ marko.save()
 marko.grupa.add(g301)
 
 print(Student.objects.all())
+print(luka.grupa.first())

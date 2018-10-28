@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse
-from .models import Termin, Student, Nastavnik, Nalog
+from .models import Termin, Student, Nastavnik, Nalog, Grupa
 
 def index(request):
     return HttpResponse("Dobrodošli na studentski servis")
@@ -12,10 +12,11 @@ def timetableforuser(request, username):
     nalog = Nalog.objects.get(username = username)
     if(nalog.uloga == "student"):
         profil = Student.objects.get(nalog=nalog)
-
+        grupaID = Student.grupa.through.objects.get(student_id=profil.id).grupa_id
+        grupa = Grupa.objects.get(id = grupaID)
         for j in range(len(termini)):
-            if profil.grupa in termini[j].grupe.all():
-               string = "%s %s %s %s %s %s %s %s<br/>" % (termini[j].oznaka_ucionice,termini[j].predmet,termini[j].tip_nastave,termini[j].nastavnik.ime,termini[j].nastavnik.prezime,termini[j].pocetak,termini[j].zavrsetak,termini[j].dan)
+            if grupa in termini[j].grupe.all():
+               string = "%s %s %s %s %s %s %s %s<br/>" % (termini[j].oznaka_ucionice,termini[j].predmet.naziv,termini[j].tip_nastave,termini[j].nastavnik.ime,termini[j].nastavnik.prezime,termini[j].pocetak,termini[j].zavrsetak,termini[j].dan)
                raspored += string
     else:
         profil = Nastavnik.objects.get(nalog=nalog)
