@@ -20,4 +20,6 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('timetable/<str:username>', views.timetableforuser, name='timetable'),
+    path('newGroup', views.newGroup, name='newGroup'),
+    path('addGroup', views.addGroup, name='addGroup'),
 ]

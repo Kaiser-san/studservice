@@ -1,16 +1,19 @@
 from django.db import models
 
-
 class Semestar(models.Model):
     vrsta = models.CharField(max_length=20)  # parni/neparni
     skolska_godina_pocetak = models.IntegerField()  # primer 2018
     skolska_godina_kraj = models.IntegerField()  # primer 2019
 
+    def __str__(self):
+        return self.vrsta + " "+str(self.skolska_godina_pocetak)+"/"+str(self.skolska_godina_kraj)
 
-class Grupa(models.Model):
+
+class Grupa(models.Model): #
     oznaka_grupe = models.CharField(max_length=10)
     smer = models.CharField(max_length=20, null=True)
     semestar = models.ForeignKey(Semestar, on_delete=models.DO_NOTHING)
+
 
 class Nalog(models.Model):
     username = models.CharField(max_length=200)
@@ -30,6 +33,7 @@ class Student(models.Model):
     def __str__(self):
         return self.ime + " " + self.prezime
 
+
 class Predmet(models.Model):
     naziv = models.CharField(max_length=200)
     espb = models.IntegerField(null=True)
@@ -37,6 +41,8 @@ class Predmet(models.Model):
     fond_predavanja = models.IntegerField(null=True)
     fond_vezbe = models.IntegerField(null=True)
 
+    def __str__(self):
+        return self.naziv
 
 class Nastavnik(models.Model):
     ime = models.CharField(max_length=200)
@@ -47,10 +53,8 @@ class Nastavnik(models.Model):
     predmet = models.ManyToManyField(Predmet)
 
 
-
-
 class RasporedNastave(models.Model):
-    datum_unosa = models.DateTimeField()
+    datum_unosa = models.DateTimeField(null=True)
     semestar = models.ForeignKey(Semestar, on_delete=models.PROTECT)
 
 
@@ -102,7 +106,8 @@ class IzborGrupe(models.Model):
     nacin_placanja = models.CharField(max_length=30)
     nepolozeni_predmeti = models.ManyToManyField(Predmet)
     student = models.ForeignKey(Student,on_delete=models.DO_NOTHING)
-    upisan = models.BooleanField()
+    izabrana_grupa = models.ForeignKey(IzbornaGrupa,on_delete=models.CASCADE)
+    upisan = models.BooleanField()  # na pocetku staviti false
 
 
 class VazniDatumi(models.Model):
@@ -128,5 +133,3 @@ class Obavestenje(models.Model):
     datum_postavljanja = models.DateTimeField()
     tekst = models.CharField(max_length=1000)
     fajl = models.FileField()
-
-
