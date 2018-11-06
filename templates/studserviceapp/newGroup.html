@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unos grupe</title>
+</head>
+<body>
+    <form action="{% url 'addGroup' %}" method="post">
+        {% csrf_token %}
+        <table border="1">
+        <tbody>
+        <tr>
+        <td>Oznaka grupe:</td>
+        <td><input type="text" rows="1" cols="10" name="oznaka_grupe" required/></td>
+        </tr>
+        <tr>
+        <td>Semestar:</td>
+        <td>
+            <select name="oznaka_semestra" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+        </td>
+        </tr>
+        <tr>
+        <td>Kapacitet</td>
+        <td><input type="number" rows="1" cols="10" name="kapacitet" required/></td>
+        </tr>
+        <tr>
+        <td>Smer:</td>
+        <td>
+            <select name="smer" required>
+                <option value="RN">RN</option>
+                <option value="RM">RM</option>
+            </select>
+        </td>
+        </tr>
+        <tr>
+        <td>Aktivna:</td>
+        <td><input type="checkbox" name="aktivna" required/></td>
+        </tr>
+        <tr>
+        <td>Za semestar:</td>
+        <td><input type="number" name='za_semestar' cols="10" required/></td>
+        </tr>
+        <tr>
+        <td>Predmeti</td>
+        <td>
+            <select name="predmeti" multiple required>
+                {% for predmet in predmeti %}
+                <option value={{predmet.id}}>{{predmet.naziv}}</option>
+                {% endfor %}
+            </select>
+        </td>
+        </tr>
+        </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Snimi">
+    </form>
+</body>
+</html>
