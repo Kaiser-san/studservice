@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Izbor grupe ({{username}})</title>
+</head>
+<body>
+	<form action="{% url 'izaberiGrupu' %}" method="post">
+		{% csrf_token %}
+	    <table border="1">
+	    	<tr>
+	    		<td> Indeks </td>
+	    		<td> 
+		    		<select name="oznaka_semestra" required>
+		                <option value="RN">RN</option>
+		                <option value="RM">RM</option>
+		                <option value="RD">RD</option>
+		                <option value="RI">RI</option>
+		                <option value="S">S</option>
+		                <option value="M">M</option>
+		                <option value="D">D</option>
+		            </select>
+		            <input type="text" rows="1" cols="5" name="broj_indeksa" size="3" required />
+		            <select name="godina_upisa" required>
+		                <option value="2013">2013</option>
+		                <option value="2014">2014</option>
+		                <option value="2015">2015</option>
+		                <option value="2016">2016</option>
+		                <option value="2017">2017</option>
+		                <option value="2018">2018</option>
+		                <option value="2019">2019</option>
+		            </select>
+		            	 
+        		</td> 
+	    	</tr>
+	    	<tr>
+	    		<td> Ime </td>
+	    		<td> <input type="text" rows="1" cols="20" name="ime" required /> </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Prezime </td>
+	    		<td> <input type="text" rows="1" cols="20" name="prezime" required /> </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Broj do sada ukupno ostvarenih ESPB </td>
+	    		<td> <input type="text" rows="1" cols="5" name="broj_ostvarenih_ESPB" size="3" required /> </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Skolske 2018/2019 godine upisujem ESPB </td>
+	    		<td> <input type="text" rows="1" cols="5" name="broj_ESPB_upisanih" size="3" required /> </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Broj do sada polozenih ispita </td>
+	    		<td> <input type="text" rows="1" cols="5" name="broj_polozenih_ispita" size="3" required /> </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Semestar </td>
+	    		<td>
+	    			{% if neparni_semestar %}
+	    			<input type="radio" name="semestar" value="1"> 1 </input>
+	    			<input type="radio" name="semestar" value="3"> 3 </input>
+	    			<input type="radio" name="semestar" value="5"> 5 </input>
+	    			<input type="radio" name="semestar" value="7"> 7 </input>	
+					{% else %}
+	    			<input type="radio" name="semestar" value="2"> 2 </input>
+	    			<input type="radio" name="semestar" value="4"> 4 </input>
+	    			<input type="radio" name="semestar" value="6"> 6 </input>
+	    			<input type="radio" name="semestar" value="8"> 8 </input>	
+	    			{% endif %}
+	    		 </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Prvi put upisuje semestar </td>
+	    		<td>
+	    			<input type="radio" name="prvi_put_upisuje" value="Da"> Da </input>
+	    			<input type="radio" name="prvi_put_upisuje" value="Ne"> Ne </input> 
+	    		 </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Grupa koju student bira </td>
+	    		<td> 
+	    			{% for grupa in grupe %}
+	    			<input type="radio" name="izbor_grupe" value="{{grupa.id}}">{{grupa.oznaka_grupe}}</input>
+	    			{% endfor %}
+	    		</td>
+	    	</tr>
+	    	<tr>
+	    		<td> Nepolozeni predmeti iz predhodnih godina </td>
+	    		<td> 
+	            	<select name="predmeti" multiple required>
+	                	{% for predmet in predmeti %}
+	                	<option value={{predmet.id}}>{{predmet.naziv}}</option>
+	                	{% endfor %}
+	            	</select>
+	            </td>
+	    	</tr>
+	    	<tr>
+	    		<td> Nacin placanja skolarine </td>
+	    		<td>
+	    			<input type="radio" name="nacin_placanja" value="odjednom"> Odjednom </input>
+	    			<input type="radio" name="nacin_placanja" value="na_rate"> Na rate </input>
+	    			<input type="radio" name="nacin_placanja" value="stipendista"> Stipendista </input>
+	    		 </td>
+	    	</tr>
+	    	<tr>
+	    		<td></td>
+	    		<td><input type="submit" value="Sacuvaj"> </td>
+	    	</tr>
+	    </table>	
+	</form>
+</body>
+</html>
