@@ -30,13 +30,16 @@ def timetableforuser(request, username):
     return HttpResponse("Dobrodošli na studentski servis, raspored za %s %s: <br/>%s" % (profil.ime,profil.prezime,raspored))
 
 def newGroup(request):
-    context = { 'predmeti' : Predmet.objects.all()}
+    context = { 'predmeti' : Predmet.objects.all() }
     return render(request, 'studserviceapp/newGroup.html', context)
 
 def addGroup(request):
-    izbornaGrupa = IzbornaGrupa(oznaka_grupe=request.POST['oznaka_grupe'], oznaka_semestra=request.POST['oznaka_semestra'], kapacitet=request.POST['kapacitet'], smer=request.POST['smer'], aktivna=True if request.POST['aktivna'] == 'on' else False, za_semestar=Semestar.objects.get(id = request.POST['za_semestar']))
+    aktivna = False
+    if 'aktivna' in request.POST and request.POST['aktivna']:
+        aktivna = True
+    izbornaGrupa = IzbornaGrupa(oznaka_grupe=request.POST['oznaka_grupe'], oznaka_semestra=request.POST['oznaka_semestra'], kapacitet=request.POST['kapacitet'], smer=request.POST['smer'], aktivna=aktivna, za_semestar=Semestar.objects.get(id = request.POST['za_semestar']))
     izbornaGrupa.save()
-    for predmet_id in request.POST['predmeti']:
+    for predmet_id in request.POST.getlist('predmeti'):
         izbornaGrupa.predmeti.add(Predmet.objects.get(id=predmet_id))
     return HttpResponse("Uspesno dodata grupa")
 
@@ -55,7 +58,7 @@ def izaberiGrupu(request):
         student = student ,
         izabrana_grupa = izabrana_grupa ,
         upisan = False)
-    for predmet_id in request.POST['predmeti']:
+    for predmet_id in request.POST.getlist('predmeti'):
         predmet = Predmet.objects.get(id=predmet_id)
         izbor_grupe.nepolozeni_predmeti.add(predmet)
     return HttpResponse("Uspesno izabrana grupa")
