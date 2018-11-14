@@ -69,3 +69,43 @@ def izborgrupe(request,username):
                 'neparni_semsetar' : True  ,
                 'grupe' : IzbornaGrupa.objects.all()}
     return render(request,'studserviceapp/izborGrupe.html',context)
+
+def changeGroup(request,grupa):
+    context = {'grupa' : IzbornaGrupa.objects.get(oznaka_grupe=grupa),
+                'predmeti' : Predmet.objects.all()}
+    return render(request,'studserviceapp/changeGroup.html',context)
+
+def changedGroup(request):
+    izbornaGrupa = IzbornaGrupa.objects.get(oznaka_grupe=request.POST['oznaka_grupe'])
+    izbornaGrupa.oznaka_semestra = oznaka_semestra=request.POST['oznaka_semestra']
+    izbornaGrupa.kapacitet = request.POST['kapacitet']
+    izbornaGrupa.smer = request.POST['smer']
+    izbornaGrupa.aktivna = False
+    if 'aktivna' in request.POST and request.POST['aktivna']:
+        izbornaGrupa.aktivna = True
+    izbornaGrupa.za_semestar = Semestar.objects.get(id = request.POST['za_semestar'])
+    izbornaGrupa.save()
+    if 'reset' in request.POST:
+        predmeti = izbornaGrupa.predmeti.through.objects.all()
+        for predmet in predmeti:
+            if(predmet.izbornagrupa_id==izbornaGrupa.id):
+                predmet.delete()
+    if 'predmeti' in request.POST:
+        for predmet_id in request.POST.getlist('predmeti'):
+            izbornaGrupa.predmeti.add(Predmet.objects.get(id=predmet_id))
+    return HttpResponse("Uspesna izmena grupe")
+
+def groupList(request):
+    context = {'grupe' : Grupa.objects.all(),
+               'studenti' : Student.objects.all()}
+    return render(request,'studserviceapp/groupList.html',context)
+
+def groupStudents(request,group):
+    studenti = " "
+    grupa = Grupa.objects.get(oznaka_grupe=group)
+
+    for student in Student.objects.all():
+        grupa = Grupa.objects.get(id = Student.grupa.through.objects.get(student_id=(Student.objects.get(nalog=student.nalog)).id).grupa_id)
+        if(grupa.oznaka_grupe==group):
+            studenti += "%s %s %s <br/>" % (student.ime, student.prezime, student.broj_indeksa)
+    return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))

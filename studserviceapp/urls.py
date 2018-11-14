@@ -21,7 +21,11 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('timetable/<str:username>', views.timetableforuser, name='timetable'),
     path('izborgrupe/<str:username>', views.izborgrupe , name='izborgrupe'),
+    path('changeGroup/<str:grupa>', views.changeGroup, name='changeGroup'),
+    path('groupStudents/<str:group>', views.groupStudents, name='groupStudents'),
     path('newGroup', views.newGroup, name='newGroup'),
     path('addGroup', views.addGroup, name='addGroup'),
-    path('izaberiGrupu',views.izaberiGrupu, name='izaberiGrupu')
+    path('izaberiGrupu',views.izaberiGrupu, name='izaberiGrupu'),
+    path('changedGroup', views.changedGroup, name='changedGroup'),
+    path('groupList', views.groupList, name='groupList')
 ]

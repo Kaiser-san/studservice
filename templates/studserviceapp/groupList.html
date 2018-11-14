@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista grupa</title>
+</head>
+<body>
+
+	<table border="1">
+        <tbody>
+	  	<tr><td>Odaberite Grupu</td></tr>
+			{% for grupa in grupe %}
+			<tr><td><a href="{% url 'groupStudents' grupa.oznaka_grupe %}">{{grupa.oznaka_grupe}}</a></td></tr>
+		    {% endfor %}  
+		</tbody>  
+	</table>
+
+</body>
+</html>
