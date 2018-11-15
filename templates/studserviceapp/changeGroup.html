@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Izmena grupe</title>
+    <title>Izmena grupe </title>
 </head>
 <body>
     <form action="{% url 'changedGroup' %}" method="post">
@@ -17,7 +17,7 @@
         <td>Semestar:</td>
         <td>
             <select name="oznaka_semestra" required>
-                <option value="1">1</option>
+                <option value="1" >1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
@@ -25,6 +25,8 @@
                 <option value="6">6</option>
                 <option value="7">7</option>
                 <option value="8">8</option>
+                <option selected="selected">{{grupa.za_semestar_id}}</option>
+                
             </select>
         </td>
         </tr>
@@ -43,7 +45,14 @@
         </tr>
         <tr>
         <td>Aktivna:</td>
-        <td><input type="checkbox" name="aktivna"/></td>
+        <td>
+            {% if grupa.aktivna %}
+            <input type="checkbox" name="aktivna" checked/>
+            {% else %}
+            <input type="checkbox" name="aktivna"/>
+            {% endif %}
+            
+        </td>
         </tr>
         <tr>
         <td>Za semestar:</td>

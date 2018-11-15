@@ -138,5 +138,5 @@ def groupStudents(request,group):
     for student in Student.objects.all():
         grupa = Grupa.objects.get(id = Student.grupa.through.objects.get(student_id=(Student.objects.get(nalog=student.nalog)).id).grupa_id)
         if(grupa.oznaka_grupe==group):
-            studenti += "%s %s %s <br/>" % (student.ime, student.prezime, student.broj_indeksa)
+            studenti += "%s %s %s %s\\%s <br/>" % (student.ime, student.prezime, student.smer, student.broj_indeksa,(student.godina_upisa%100))
     return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))
