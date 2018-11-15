@@ -64,10 +64,41 @@ def izaberiGrupu(request):
     return HttpResponse("Uspesno izabrana grupa")
 
 def izborgrupe(request,username):
-    context = {'username' : username ,
-                'predmeti' : Predmet.objects.all() ,
-                'neparni_semsetar' : True  ,
-                'grupe' : IzbornaGrupa.objects.all()}
+    if(not Nalog.objects.filter(username=username).exists()):
+        return HttpResponse("Nalog {} ne postoji".format(username))
+
+    nalog = Nalog.objects.get(username=username)
+    student = Student.objects.get(nalog=nalog)
+
+    if(IzborGrupe.objects.filter(student=student).exists()):
+        return HttpResponse("Vec ste izabrali grupu.")
+
+    curr_semestar = Semestar.objects.order_by('-pk')[0]
+    neparni_semsetar = (curr_semestar.vrsta == 'neparni')
+
+    skolska_godina_pocetak = curr_semestar.skolska_godina_pocetak
+    skolska_godina_kraj = curr_semestar.skolska_godina_kraj
+
+    semestri = [1,3,5,7] if neparni_semsetar else [2,4,6,8]
+    predmeti = Predmet.objects.all()
+    izborne_grupe = IzbornaGrupa.objects.all()
+
+    smerovi = ['RN','RM','RD','RI','S','M','D']
+    smerovi.remove(student.smer)
+    smerovi = [student.smer] + smerovi
+
+    godine_upisa = [2013,2014,2015,2016,2017,2018]
+    godine_upisa.remove(student.godina_upisa)
+    godine_upisa = [student.godina_upisa] + godine_upisa
+
+    context = { 'student' : student ,
+                'predmeti' : predmeti ,
+                'smerovi' : smerovi ,
+                'godine_upisa' : godine_upisa ,
+                'skolska_godina_pocetak' : skolska_godina_pocetak ,
+                'skolska_godina_kraj' : skolska_godina_kraj ,
+                'semestri' : semestri ,
+                'grupe' : izborne_grupe}
     return render(request,'studserviceapp/izborGrupe.html',context)
 
 def changeGroup(request,grupa):

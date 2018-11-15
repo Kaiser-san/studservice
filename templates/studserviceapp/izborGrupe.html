@@ -12,41 +12,34 @@
 	    		<td> Indeks </td>
 	    		<td> 
 		    		<select name="oznaka_semestra" required>
-		                <option value="RN">RN</option>
-		                <option value="RM">RM</option>
-		                <option value="RD">RD</option>
-		                <option value="RI">RI</option>
-		                <option value="S">S</option>
-		                <option value="M">M</option>
-		                <option value="D">D</option>
+		    			{% for smer in smerovi %}
+		    			<option value='{{smer}}' {% if student.smer == '{{smer}}' %} selected {% endif %}>{{smer}}</option>
+		    			{% endfor %}
 		            </select>
-		            <input type="text" rows="1" cols="5" name="broj_indeksa" size="3" required />
+		            <input type="text" rows="1" cols="5" name="broj_indeksa" size="3" value='{{ student.broj_indeksa }}' required />
+		            /
 		            <select name="godina_upisa" required>
-		                <option value="2013">2013</option>
-		                <option value="2014">2014</option>
-		                <option value="2015">2015</option>
-		                <option value="2016">2016</option>
-		                <option value="2017">2017</option>
-		                <option value="2018">2018</option>
-		                <option value="2019">2019</option>
+		            	{% for godina in godine_upisa %}
+						<option value="{{godina}}" {% if student.godina_upisa == '{{godina}}' %} selected {% endif %}>{{godina}}</option>
+		            	{% endfor %}
 		            </select>
 		            	 
         		</td> 
 	    	</tr>
 	    	<tr>
 	    		<td> Ime </td>
-	    		<td> <input type="text" rows="1" cols="20" name="ime" required /> </td>
+	    		<td> <input type="text" rows="1" cols="20" name="ime" value = '{{ student.ime }}' required /> </td>
 	    	</tr>
 	    	<tr>
 	    		<td> Prezime </td>
-	    		<td> <input type="text" rows="1" cols="20" name="prezime" required /> </td>
+	    		<td> <input type="text" rows="1" cols="20" name="prezime" value = '{{student.prezime}}' required /> </td>
 	    	</tr>
 	    	<tr>
 	    		<td> Broj do sada ukupno ostvarenih ESPB </td>
 	    		<td> <input type="text" rows="1" cols="5" name="broj_ostvarenih_ESPB" size="3" required /> </td>
 	    	</tr>
 	    	<tr>
-	    		<td> Skolske 2018/2019 godine upisujem ESPB </td>
+	    		<td> Skolske {{skolska_godina_pocetak}}/{{skolska_godina_kraj}} godine upisujem ESPB </td>
 	    		<td> <input type="text" rows="1" cols="5" name="broj_ESPB_upisanih" size="3" required /> </td>
 	    	</tr>
 	    	<tr>
@@ -56,17 +49,9 @@
 	    	<tr>
 	    		<td> Semestar </td>
 	    		<td>
-	    			{% if neparni_semestar %}
-	    			<input type="radio" name="semestar" value="1"> 1 </input>
-	    			<input type="radio" name="semestar" value="3"> 3 </input>
-	    			<input type="radio" name="semestar" value="5"> 5 </input>
-	    			<input type="radio" name="semestar" value="7"> 7 </input>	
-					{% else %}
-	    			<input type="radio" name="semestar" value="2"> 2 </input>
-	    			<input type="radio" name="semestar" value="4"> 4 </input>
-	    			<input type="radio" name="semestar" value="6"> 6 </input>
-	    			<input type="radio" name="semestar" value="8"> 8 </input>	
-	    			{% endif %}
+	    			{% for sm in semestri %}
+	    			<input type="radio" name="semestar" value='{{sm}}'> {{sm}} </input>
+	    			{% endfor %}
 	    		 </td>
 	    	</tr>
 	    	<tr>
