@@ -17,16 +17,13 @@
         <td>Semestar:</td>
         <td>
             <select name="oznaka_semestra" required>
-                <option value="1" >1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option selected="selected">{{grupa.za_semestar_id}}</option>
-                
+                {% for i in "12345678" %}
+                {% if grupa.oznaka_semestra == forloop.counter0 %}
+                <option value={{forloop.counter0}} selected>{{forloop.counter0}}</option>
+                {% else %}
+                <option value={{forloop.counter0a}}>{{forloop.counter0}}</option>
+                {% endif %}
+                {% endfor %}
             </select>
         </td>
         </tr>
@@ -38,8 +35,16 @@
         <td>Smer:</td>
         <td>
             <select name="smer" required>
+                {% if grupa.smer == "RN" %}
+                <option value="RN" selected>RN</option>
+                {% else %}
                 <option value="RN">RN</option>
+                {% endif %}
+                {% if grupa.smer == "RM" %}
+                <option value="RM" selected>RM</option>
+                {% else %}
                 <option value="RM">RM</option>
+                {% endif %}
             </select>
         </td>
         </tr>
@@ -51,12 +56,11 @@
             {% else %}
             <input type="checkbox" name="aktivna"/>
             {% endif %}
-            
         </td>
         </tr>
         <tr>
         <td>Za semestar:</td>
-        <td><input type="number" name='za_semestar' cols="10" required/></td>
+        <td><input type="number" name='za_semestar' cols="10" value = {{grupa.za_semestar_id}} required/></td>
         </tr>
         <tr>
         <td>Pobrisati postojece predmete:</td>

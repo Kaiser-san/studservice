@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from .models import *
 
 def index(request):
-    return HttpResponse("Dobrodošli na studentski servis")
+    return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
 
 def timetableforuser(request, username):
     raspored=" "
@@ -81,7 +81,11 @@ def izborgrupe(request,username):
 
     semestri = [1,3,5,7] if neparni_semsetar else [2,4,6,8]
     predmeti = Predmet.objects.all()
-    izborne_grupe = IzbornaGrupa.objects.all()
+
+    popunjenost_grupa = {x.id: 0 for x in IzbornaGrupa.objects.all()}
+    for izbor_grupe in IzborGrupe.objects.all():
+        popunjenost_grupa[izbor_grupe.izabrana_grupa.id] += 1
+    izborne_grupe = list(filter(lambda grupa: popunjenost_grupa[grupa.id] < grupa.kapacitet and grupa.aktivna, IzbornaGrupa.objects.all()))
 
     smerovi = ['RN','RM','RD','RI','S','M','D']
     smerovi.remove(student.smer)
