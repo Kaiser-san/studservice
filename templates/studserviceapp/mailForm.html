@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Slanje Mail-a</title>
+</head>
+<body>
+    <form action="{% url 'mailSent' %}" method="post">
+		{% csrf_token %}
+		<table border="1">
+		<tbody>
+			<tr>
+				<td>
+					<select name="primalac" required>
+						{% ifnotequal uloga "nastavnik" %} 
+							<option value="svi"> Sve </option>
+						{% endifnotequal %}
+						{% for predmet in opcijePredmeti %}
+						<option value={{predmet.id}}> {{predmet.naziv}} </option>
+						{% endfor %}
+						{% for grupa in opcijeGrupe %}
+						<option value={{grupa.id}}> {{grupa.oznaka_grupe}} </option>
+						{% endfor %}
+					</select>
+			    </td>
+			</tr>
+		    <tr>			    
+			    <td>
+			    	{% ifequal uloga "nastavnik" %} {{person.ime}} {{person.prezime}}   {% endifequal %}
+			    	 - {{person.nalog.username}}@raf.rs
+			    </td>
+			    
+		    </tr>	
+		    <tr>
+		    	<td><input type="text" rows="1" name="subject"></td>
+		    </tr>
+		    <tr>
+		    	<td><textarea name="body" rows="10" cols="50"></textarea></td>
+		    </tr>
+	    </tbody>
+		</table>
+	    <input type="submit" value="Posalji">
+	</form>
+</body>
+</html>

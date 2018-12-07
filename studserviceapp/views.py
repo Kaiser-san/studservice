@@ -144,3 +144,65 @@ def groupStudents(request,group):
         if(grupa.oznaka_grupe==group):
             studenti += "%s %s %s %s\\%s <br/>" % (student.ime, student.prezime, student.smer, student.broj_indeksa,(student.godina_upisa%100))
     return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))
+
+def sendMail(request, username):
+    nalog = Nalog.objects.get(username=username)
+    uloga = nalog.uloga
+    opcijePredmeti = []
+    opcijeGrupe = []
+    opcijeSmer = []
+
+    if (uloga == "student"):
+        return HttpResponse("Student ne moze da salje mail-ove!")
+
+    elif(uloga == "nastavnik"):
+        person = Nastavnik.objects.get(nalog=nalog)
+
+        predmetiID = []
+        for predmet in person.predmet.through.objects.all():
+            if(predmet.nastavnik_id == person.nalog_id):
+                predmetiID.append(predmet.predmet_id)
+        for predmet in Predmet.objects.all():
+            if predmet.id in predmetiID:
+                opcijePredmeti.append(predmet)
+
+        terminiID = []
+        for termin in Termin.objects.all():
+            if (termin.predmet_id in predmetiID and person.id==termin.nastavnik_id):
+                ter = termin
+                terminiID.append(termin.id)
+        terminGrupe = ter.grupe.through.objects.all()
+        grupeID = []
+        for grupa in terminGrupe:
+            if(grupa.termin_id in terminiID):
+                grupeID.append(grupa.grupa_id)
+        for grupa in Grupa.objects.all():
+            if grupa.id in grupeID:
+                opcijeGrupe.append(grupa)
+
+    else:
+        person = nalog;
+        for grupa in Grupa.objects.all():
+            if not(grupa in opcijeGrupe):
+                opcijeGrupe.append(grupa)
+        for predmet in Predmet.objects.all():
+            if not(predmet in opcijePredmeti):
+                opcijePredmeti.append(predmet)
+    opcijeGrupe.sort(key = lambda x : x.oznaka_grupe)
+    opcijePredmeti.sort(key = lambda x : x.naziv)
+    context = {'person' : person,
+                'uloga' : uloga,
+                'opcijePredmeti' : opcijePredmeti,
+                'opcijeGrupe' : opcijeGrupe}
+    return render(request,'studserviceapp/mailForm.html',context)
+
+def mailSent(request):
+    body = ""
+    subject = ""
+
+    if 'body' in request.POST:
+        body = request.POST['body']
+    if 'subject' in request.POST:
+        subject = request.POST['subject']
+    
+    return HttpResponse("Uspesno poslat mail!")
