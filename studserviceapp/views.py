@@ -4,6 +4,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
 
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
 def index(request):
     return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
 
@@ -204,5 +207,47 @@ def mailSent(request):
         body = request.POST['body']
     if 'subject' in request.POST:
         subject = request.POST['subject']
-    
+
     return HttpResponse("Uspesno poslat mail!")
+def podaciStudenta(request, username):
+    studentNalog = Nalog.objects.get(username = username)
+    context = { 'student' : Student.objects.get(nalog=studentNalog) }
+    return render(request, 'studserviceapp/podaciStudenta.html', context)
+
+def uploadSliku(request):
+    nalog = Nalog.objects.get(username = request.POST['nalog'])
+    student = Student.objects.get(nalog = nalog)
+    pic = request.FILES['pic']
+    fs = FileSystemStorage()
+    filename = fs.save(pic.name, pic)
+    student.slika = fs.url(filename)
+    student.save()
+    return HttpResponse("Uspesno dodata slika")
+
+
+
+def predajeStudentima(request, username):
+    profesorNalog = Nalog.objects.get(username = username)
+    profesor = Nastavnik.objects.get(nalog=profesorNalog)
+    context = { 'predmeti' : {} }
+    for predmet in profesor.predmet.all():
+        context['predmeti'][predmet.naziv] = []
+        for izbornaGrupa in IzbornaGrupa.objects.all():
+            if predmet in izbornaGrupa.predmeti.all():
+                context['predmeti'][predmet.naziv].append(izbornaGrupa)
+    return render(request, 'studserviceapp/predajeStudentima.html', context)
+
+def izbornaGrupaList(request, group):
+    studenti = " "
+    for student in Student.objects.all():
+        try:
+            izborGrupe = IzborGrupe.objects.get(student=student)
+        except IzborGrupe.DoesNotExist:
+            continue
+        izbornaGrupa = IzbornaGrupa.objects.get(oznaka_grupe=izborGrupe.izabrana_grupa.oznaka_grupe)
+        if(izbornaGrupa.oznaka_grupe==group):
+            if student.slika and hasattr(student.slika, 'url'):
+                studenti += "<a href=" + student.slika.url + ">" + student.ime + "</a><br/>"
+            else:
+                studenti += student.ime + "<br/>"
+    return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))

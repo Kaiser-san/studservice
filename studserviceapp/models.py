@@ -29,6 +29,7 @@ class Student(models.Model):
     smer = models.CharField(max_length=20)
     nalog = models.ForeignKey(Nalog, on_delete=models.CASCADE)
     grupa = models.ManyToManyField(Grupa)
+    slika = models.ImageField(null=True)
 
     def __str__(self):
         return self.ime + " " + self.prezime

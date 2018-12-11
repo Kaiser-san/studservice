@@ -29,5 +29,14 @@ urlpatterns = [
     path('izaberiGrupu',views.izaberiGrupu, name='izaberiGrupu'),
     path('changedGroup', views.changedGroup, name='changedGroup'),
     path('groupList', views.groupList, name='groupList'),
-    path('mailSent', views.mailSent, name='mailSent')
+    path('mailSent', views.mailSent, name='mailSent'),
+    path('podaciStudenta/<str:username>', views.podaciStudenta , name='podaciStudenta'),
+    path('uploadSliku', views.uploadSliku , name='uploadSliku'),
+    path('predajeStudentima/<str:username>', views.predajeStudentima , name='predajeStudentima'),
+    path('izbornaGrupaList/<str:group>', views.izbornaGrupaList , name='izbornaGrupaList')
 ]
+
+from django.conf import settings
+from django.conf.urls.static import static
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
