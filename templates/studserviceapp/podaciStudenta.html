@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Podaci studenta</title>
+</head>
+<body>
+    <form action="{% url 'uploadSliku' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table border="1">
+        <tbody>
+        <tr>
+        <td>Ime:</td>
+        <td>{{student.ime}} {{student.prezime}}</td>
+        </tr>
+        <tr>
+        <td>Broj indeksa:</td>
+        <td>{{student.broj_indeksa}}</td>
+        </tr>
+        <tr>
+        <td>Godina upisa:</td>
+        <td>{{student.godina_upisa}}</td>
+        </tr>
+        <tr>
+        <td>Smer:</td>
+        <td>{{student.smer}}</td>
+        </tr>
+        <tr>
+        <td>Nalog:</td>
+        <td>{{student.nalog.username}}</td>
+        </tr>
+        <tr>
+        <td>Grupa:</td>
+        <td>{{student.grupa.oznaka_grupe}}</td>
+        </tr>
+        <tr>
+        <td>Slika:</td>
+        <td>
+            {% block content %}
+            {% if student.slika != null %}
+            <img src="{{ student.slika.url }}">
+            {% endif %}
+            {% endblock %}
+        </td>
+        </tr>
+        <tr>
+        <td>Upload:</td>
+        <td>
+            <input type="file" name="pic" accept="image/*">
+        </td>
+        </tr>
+        </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Snimi">
+        <input type="hidden" name="nalog" value={{student.nalog.username}} />
+    </form>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista grupa</title>
+</head>
+<body>
+
+{% for key, value in predmeti.items %}
+    {{key}}
+    <br/>
+    {% for grupa in value %}
+        <a href="{% url 'izbornaGrupaList' grupa.oznaka_grupe %}">{{grupa.oznaka_grupe}}</a>
+        <br/>
+    {% endfor %}
+{% endfor %}
+
+</body>
+</html>
