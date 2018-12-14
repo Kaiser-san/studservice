@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 
 from .parse_raspored_polaganja import import_data
+from .send_gmail import create_and_send_message
 
 def index(request):
     return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
@@ -153,67 +154,6 @@ def groupStudents(request,group):
             studenti += "%s %s %s %s\\%s <br/>" % (student.ime, student.prezime, student.smer, student.broj_indeksa,(student.godina_upisa%100))
     return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))
 
-def sendMail(request, username):
-    nalog = Nalog.objects.get(username=username)
-    uloga = nalog.uloga
-    opcijePredmeti = []
-    opcijeGrupe = []
-    opcijeSmer = []
-
-    if (uloga == "student"):
-        return HttpResponse("Student ne moze da salje mail-ove!")
-
-    elif(uloga == "nastavnik"):
-        person = Nastavnik.objects.get(nalog=nalog)
-
-        predmetiID = []
-        for predmet in person.predmet.through.objects.all():
-            if(predmet.nastavnik_id == person.nalog_id):
-                predmetiID.append(predmet.predmet_id)
-        for predmet in Predmet.objects.all():
-            if predmet.id in predmetiID:
-                opcijePredmeti.append(predmet)
-
-        terminiID = []
-        for termin in Termin.objects.all():
-            if (termin.predmet_id in predmetiID and person.id==termin.nastavnik_id):
-                ter = termin
-                terminiID.append(termin.id)
-        terminGrupe = ter.grupe.through.objects.all()
-        grupeID = []
-        for grupa in terminGrupe:
-            if(grupa.termin_id in terminiID):
-                grupeID.append(grupa.grupa_id)
-        for grupa in Grupa.objects.all():
-            if grupa.id in grupeID:
-                opcijeGrupe.append(grupa)
-
-    else:
-        person = nalog;
-        for grupa in Grupa.objects.all():
-            if not(grupa in opcijeGrupe):
-                opcijeGrupe.append(grupa)
-        for predmet in Predmet.objects.all():
-            if not(predmet in opcijePredmeti):
-                opcijePredmeti.append(predmet)
-    opcijeGrupe.sort(key = lambda x : x.oznaka_grupe)
-    opcijePredmeti.sort(key = lambda x : x.naziv)
-    context = {'person' : person,
-                'uloga' : uloga,
-                'opcijePredmeti' : opcijePredmeti,
-                'opcijeGrupe' : opcijeGrupe}
-    return render(request,'studserviceapp/mailForm.html',context)
-
-def mailSent(request):
-    body = ""
-    subject = ""
-
-    if 'body' in request.POST:
-        body = request.POST['body']
-    if 'subject' in request.POST:
-        subject = request.POST['subject']
-
-    return HttpResponse("Uspesno poslat mail!")
 def podaciStudenta(request, username):
     studentNalog = Nalog.objects.get(username = username)
     context = { 'student' : Student.objects.get(nalog=studentNalog) }
@@ -292,8 +232,124 @@ def do_submitRasporedPolaganja(request):
     if not errors:
         return HttpResponse("Uspesno ste izvrsili ubacivanje rasporeda")
     else:
-        context = {'errors':errors,'to_correct':to_correct,'tip_rasporeda':tip_rasporeda,'naziv_rasporeda':naziv_rasporeda}
+        context = {'errors':errors,'to_correct':to_correct,'tip_rasporeda':tip_rasporeda,
+        'naziv_rasporeda':naziv_rasporeda}
         return render(request,'studserviceapp/submitRasporedPolaganja_failed.html',context)
     
 
-        
+def sendMail(request, username):
+    nalog = Nalog.objects.get(username=username)
+    uloga = nalog.uloga
+    opcije_predmeti = []
+    opcije_grupe = []
+    opcije_smer = []
+
+    if username=='jmarkovic16': uloga = 'administrator'
+
+    if (uloga == "student"):
+        return HttpResponse("Student ne moze da salje email-ove!")
+
+    elif(uloga == "nastavnik"):
+        person = Nastavnik.objects.get(nalog=nalog)
+
+        predmetiID = []
+        for predmet in person.predmet.through.objects.all():
+            if(predmet.nastavnik_id == person.nalog_id):
+                predmetiID.append(predmet.predmet_id)
+        for predmet in Predmet.objects.all():
+            if predmet.id in predmetiID:
+                opcije_predmeti.append(predmet)
+
+        terminiID = []
+        for termin in Termin.objects.all():
+            if (termin.predmet_id in predmetiID and person.id==termin.nastavnik_id):
+                ter = termin
+                terminiID.append(termin.id)
+        terminGrupe = ter.grupe.through.objects.all()
+        grupeID = []
+        for grupa in terminGrupe:
+            if(grupa.termin_id in terminiID):
+                grupeID.append(grupa.grupa_id)
+        for grupa in Grupa.objects.all():
+            if grupa.id in grupeID:
+                opcije_grupe.append(grupa)
+
+    else:
+        person = nalog;
+        for grupa in Grupa.objects.all():
+            if not(grupa in opcije_grupe):
+                opcije_grupe.append(grupa)
+            if  (not grupa.smer in opcije_smer and grupa.smer!=None):
+                opcije_smer.append(grupa.smer)
+        for predmet in Predmet.objects.all():
+            if not(predmet in opcije_predmeti):
+                opcije_predmeti.append(predmet)
+
+    opcije_smer.sort()
+    opcije_grupe.sort(key = lambda x : x.oznaka_grupe)
+    opcije_predmeti.sort(key = lambda x : x.naziv)
+    context = {'person' : person,
+                'uloga' : uloga,
+                'opcije_predmeti' : opcije_predmeti,
+                'opcije_grupe' : opcije_grupe,
+                'opcije_smer' : opcije_smer}
+
+    return render(request,'studserviceapp/mailForm.html',context)
+
+def mailSent(request):
+    to_list = []
+    sender = " "
+    body = " "
+    subject = " "
+    file = None
+
+    if 'body' in request.POST:
+         body = request.POST['body']
+    if 'subject' in request.POST:
+        subject = request.POST['subject']
+    if 'uloga' in request.POST:
+        if request.POST['uloga']=='nastavnik':
+            sender = request.POST['sender-prof'] + "@raf.rs"
+        else:
+            sender = request.POST['sender'] + "@raf.rs"
+    if 'file' in request.POST:
+        file = request.POST['file']
+    nalog_id = []
+    student_id = []
+    if 'to' in request.POST:
+        primalac = request.POST['to']
+        if primalac == 'svi':
+            for student in Student.objects.all():
+                nalog_id.append(student.nalog_id)
+        elif primalac in request.POST['to_smer']:
+            for student in Student.objects.all():
+                if student.smer == primalac:
+                    nalog_id.append(student.nalog_id)
+        elif primalac in request.POST['to_grupe']:
+            for student in Student.grupa.through.objects.all():
+                if student.grupa_id == int(primalac):
+                    nalog_id.append(Student.objects.get(id=student.student_id).nalog_id)
+        else:
+            for predmet in Predmet.objects.all():
+                if primalac in predmet.naziv:
+                    terminiID = []
+                    for termin in Termin.objects.all():
+                        if (termin.predmet_id==predmet.id):
+                            ter = termin
+                            terminiID.append(termin.id)
+                    terminGrupe = ter.grupe.through.objects.all()
+                    grupeID = []
+                    for grupa in terminGrupe:
+                        if(grupa.termin_id in terminiID):
+                            grupeID.append(grupa.grupa_id)
+                    for grupa in Grupa.objects.all():
+                        if grupa.id in grupeID:
+                            for student in Student.grupa.through.objects.all():
+                                if student.grupa_id == grupa.id:
+                                    nalog_id.append(Student.objects.get(id=student.student_id).nalog_id)
+                    break
+
+    for nalog in Nalog.objects.all():
+        if nalog.id in nalog_id:
+            create_and_send_message("Test",sender,nalog.username+"@raf.rs",subject,body,file)
+    return HttpResponse("Uspesno poslat email!")

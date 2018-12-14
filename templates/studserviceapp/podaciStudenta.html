@@ -37,9 +37,9 @@
         <td>Slika:</td>
         <td>
             {% block content %}
-            {% if student.slika != null %}
+            {% ifequal student.slika null %}
             <img src="{{ student.slika.url }}">
-            {% endif %}
+            {% endifequal %}
             {% endblock %}
         </td>
         </tr>
