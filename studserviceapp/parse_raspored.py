@@ -16,6 +16,16 @@ FILE_NAME = "raspored.csv"
 
 GODINA = 2018
 
+def simplify(string):
+	ch_from = "ČĆŠŽčćšž"
+	ch_to = "CCSZccsz"
+
+	for i in range(len(ch_from)):
+		string = string.replace(ch_from[i],ch_to[i])
+
+	string = string.replace("Đ","Dj")
+	string = string.replace("đ","dj")
+
 def parse_vreme_termina(string):
 	(begin,end) = string.split("-")
 	begin_date = datetime.strptime(begin, '%H:%M')
@@ -37,7 +47,12 @@ def skip(row):
 
 def process_nastavnik(row,curr_predmet,offset):
 	nastavnik = None
-	prezime,ime = row[offset].split(" ")[:2]
+	if(len(row[offset].split(" ")) == 3):
+		prezime1,prezime2,ime = row[offset].split(" ")
+		prezime = prezime1 + " " + prezime2
+	else:
+		prezime,ime = row[offset].split(" ")
+		
 	if(Nastavnik.objects.filter(ime=ime,prezime=prezime).exists()): # Ako nastavnik vec postoji u bazi
 		nastavnik = Nastavnik.objects.get(ime=ime,prezime=prezime)
 	else:

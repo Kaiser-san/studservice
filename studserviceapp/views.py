@@ -1,11 +1,16 @@
 from django.shortcuts import render
 
+import csv
+import io
+
 # Create your views here.
 from django.http import HttpResponse
 from .models import *
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+
+from .parse_raspored_polaganja import import_data
 
 def index(request):
     return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
@@ -251,3 +256,44 @@ def izbornaGrupaList(request, group):
             else:
                 studenti += student.ime + "<br/>"
     return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))
+
+def submitRasporedPolaganja(request):
+    return render(request,'studserviceapp/submitRasporedPolaganja.html')
+
+def do_submitRasporedPolaganja(request):
+    if 'dokument' in request.FILES:
+        tip_rasporeda = request.POST['tip_rasporeda']
+        naziv_rasporeda = request.POST['naziv_rasporeda']
+        file = request.FILES['dokument']
+        file = file.read().decode('UTF-8')
+        file = io.StringIO(file)
+        dokument = csv.reader(file)
+
+    else:
+        tip_rasporeda = request.POST['tip_rasporeda']
+        naziv_rasporeda = request.POST['naziv_rasporeda']
+        predmeti = request.POST.getlist('predmet[]')
+        profesori = request.POST.getlist('profesor[]')
+        ucionice = request.POST.getlist('ucionice[]')
+        vreme = request.POST.getlist('vreme[]')
+        dan = request.POST.getlist('dan[]')
+        datum = request.POST.getlist('datum[]')
+
+        dokument = []
+
+        for i in range(len(predmeti)):
+            dokument.append([predmeti[i],"","",profesori[i],ucionice[i],vreme[i],dan[i],datum[i]])
+
+
+    if(tip_rasporeda=='klk_nedelja'):
+        errors,to_correct = import_data(dokument,klk_nedelja=naziv_rasporeda)
+    else:
+        errors,to_correct = import_data(dokument,ispitni_rok=naziv_rasporeda)
+    if not errors:
+        return HttpResponse("Uspesno ste izvrsili ubacivanje rasporeda")
+    else:
+        context = {'errors':errors,'to_correct':to_correct,'tip_rasporeda':tip_rasporeda,'naziv_rasporeda':naziv_rasporeda}
+        return render(request,'studserviceapp/submitRasporedPolaganja_failed.html',context)
+    
+
+        
