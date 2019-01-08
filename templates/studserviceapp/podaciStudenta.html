@@ -37,8 +37,8 @@
         <td>Slika:</td>
         <td>
             {% block content %}
-            {% ifnotequal student.slika null %}
-            <img src="{{ student.slika.url }}">
+            {% ifnotequal slikaURL '' %}
+            <img src="{{ slikaURL }}">
             {% endifnotequal %}
             {% endblock %}
         </td>

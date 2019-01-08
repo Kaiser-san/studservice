@@ -158,7 +158,11 @@ def groupStudents(request,group):
 
 def podaciStudenta(request, username):
     studentNalog = Nalog.objects.get(username = username)
-    context = { 'student' : Student.objects.get(nalog=studentNalog) }
+    student = Student.objects.get(nalog=studentNalog)
+    slikaUrl = ''
+    if student.slika.name:
+        slikaUrl = student.slika.url
+    context = { 'student' : student, 'slikaURL' : slikaUrl }
     return render(request, 'studserviceapp/podaciStudenta.html', context)
 
 def uploadSliku(request):
