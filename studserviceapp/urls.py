@@ -35,7 +35,8 @@ urlpatterns = [
     path('predajeStudentima/<str:username>', views.predajeStudentima , name='predajeStudentima'),
     path('izbornaGrupaList/<str:group>', views.izbornaGrupaList , name='izbornaGrupaList'),
     path('submitRasporedPolaganja', views.submitRasporedPolaganja, name='submitRasporedPolaganja'),
-    path('submitRasporedPolaganja/submit', views.do_submitRasporedPolaganja, name='do_submitRasporedPolaganja')
+    path('submitRasporedPolaganja/submit', views.do_submitRasporedPolaganja, name='do_submitRasporedPolaganja'),
+    path('home/<str:username>', views.home, name='home')
 ]
 
 from django.conf import settings

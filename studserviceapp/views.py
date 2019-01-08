@@ -3,6 +3,8 @@ from django.shortcuts import render
 import csv
 import io
 
+import json
+
 # Create your views here.
 from django.http import HttpResponse
 from .models import *
@@ -353,3 +355,99 @@ def mailSent(request):
         if nalog.id in nalog_id:
             create_and_send_message("Test",sender,nalog.username+"@raf.rs",subject,body,file)
     return HttpResponse("Uspesno poslat email!")
+
+def home(request, username):
+    nalog = Nalog.objects.get(username = username)
+    linkovi = {}
+    raspored =[]
+    if nalog.uloga == 'student':
+        student = Student.objects.get(nalog=nalog)
+        for termin in Termin.objects.all():
+            if student.grupa.get() in termin.grupe.all():
+                terminGrupe = termin.grupe.order_by('oznaka_grupe').first().oznaka_grupe
+                for grupa in termin.grupe.order_by('oznaka_grupe'):
+                    terminGrupe += ', ' + grupa.oznaka_grupe
+                raspored.append([termin.predmet.naziv, termin.tip_nastave, termin.nastavnik.ime + " " + termin.nastavnik.prezime, terminGrupe, termin.dan, termin.pocetak.strftime("%H:%M") + '-' + termin.zavrsetak.strftime("%H:%M"), termin.oznaka_ucionice])
+        linkovi['Ceo Raspored'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Podaci Studenta'] = 'http://127.0.0.1:8000/studserviceapp/podaciStudenta/'+nalog.username
+        if IzbornaGrupa.objects.count() > 0:
+            linkovi['Izbor Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborgrupe/'+nalog.username
+    elif nalog.uloga == 'nastavnik':
+        nastavnik = Nastavnik.objects.get(nalog=nalog)
+        for termin in Termin.objects.all():
+            if nastavnik == termin.nastavnik:
+                terminGrupe = termin.grupe.order_by('oznaka_grupe').first().oznaka_grupe
+                for grupa in termin.grupe.order_by('oznaka_grupe'):
+                    terminGrupe += ', ' + grupa.oznaka_grupe
+                raspored.append(
+                    [termin.predmet.naziv, termin.tip_nastave, termin.nastavnik.ime + " " + termin.nastavnik.prezime,
+                     terminGrupe, termin.dan,
+                     termin.pocetak.strftime("%H:%M") + '-' + termin.zavrsetak.strftime("%H:%M"),
+                     termin.oznaka_ucionice])
+        linkovi['Ceo Raspored'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Predaje Studentima'] = 'http://127.0.0.1:8000/studserviceapp/predajeStudentima/' + nalog.username
+        linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + nalog.username
+    elif nalog.uloga == 'sekretar':
+        for termin in Termin.objects.all():
+            terminGrupe = termin.grupe.order_by('oznaka_grupe').first().oznaka_grupe
+            for grupa in termin.grupe.order_by('oznaka_grupe'):
+                terminGrupe += ', ' + grupa.oznaka_grupe
+            raspored.append(
+                [termin.predmet.naziv, termin.tip_nastave, termin.nastavnik.ime + " " + termin.nastavnik.prezime,
+                 terminGrupe, termin.dan,
+                 termin.pocetak.strftime("%H:%M") + '-' + termin.zavrsetak.strftime("%H:%M"),
+                 termin.oznaka_ucionice])
+        linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + nalog.username
+        linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe'
+        linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList'
+    else:
+        for termin in Termin.objects.all():
+            terminGrupe = termin.grupe.order_by('oznaka_grupe').first().oznaka_grupe
+            for grupa in termin.grupe.order_by('oznaka_grupe'):
+                terminGrupe += ', ' + grupa.oznaka_grupe
+            raspored.append(
+                [termin.predmet.naziv, termin.tip_nastave, termin.nastavnik.ime + " " + termin.nastavnik.prezime,
+                 terminGrupe, termin.dan,
+                 termin.pocetak.strftime("%H:%M") + '-' + termin.zavrsetak.strftime("%H:%M"),
+                 termin.oznaka_ucionice])
+        linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + nalog.username
+        linkovi['Unos Grupe'] = 'http://127.0.0.1:8000/studserviceapp/newGroup'
+        linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe'
+        linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList'
+    grupe = []
+    for grupa in Grupa.objects.all():
+        grupe.append(grupa.oznaka_grupe)
+    grupe.sort()
+
+    nastavnici = []
+    for nastavnik in Nastavnik.objects.all():
+        nastavnici.append(nastavnik.ime + ' ' + nastavnik.prezime)
+    nastavnici.sort()
+
+    ucionice = set()
+    for termin in Termin.objects.all():
+        ucionice.add(termin.oznaka_ucionice)
+    ucionice = list(ucionice)
+    ucionice.sort()
+
+    obavestenja = []
+    for obavestenje in Obavestenje.objects.order_by('datum_postavljanja')[0:5]:
+        fajl = ''
+        if obavestenje.fajl.name:
+            fajl = obavestenje.fajl.url
+        obavestenja.append([obavestenje.postavio, obavestenje.datum_postavljanja.strftime("%Y-%m-%d %H:%M:%S"), obavestenje.tekst, fajl])
+
+    context = \
+        {
+            'ime' : json.dumps(student.ime, ensure_ascii=False) ,
+            'prezime' : json.dumps(student.prezime, ensure_ascii=False),
+            'linkovi' : json.dumps(linkovi),
+            'raspored' : json.dumps(raspored),
+            'grupe' : json.dumps(grupe),
+            'nastavnici' : json.dumps(nastavnici),
+            'ucionice' : json.dumps(ucionice),
+            'obavestenja' : json.dumps(obavestenja)
+        }
+    return render(request, 'studserviceapp/home.html', context)
