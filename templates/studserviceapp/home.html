@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title id="naslov">
+        Servis
     </title>
     <style>
 
@@ -110,8 +111,6 @@
     }
 
     $(document).ready(function() {
-        var ime = {{ime|safe}} + " " + {{prezime|safe}};
-        $('#naslov')[0].innerHTML = ime;
         var linkovi = {{linkovi|safe}};
         for(var key in linkovi) {
             var link = document.createElement('a');

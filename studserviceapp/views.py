@@ -441,8 +441,6 @@ def home(request, username):
 
     context = \
         {
-            'ime' : json.dumps(student.ime, ensure_ascii=False) ,
-            'prezime' : json.dumps(student.prezime, ensure_ascii=False),
             'linkovi' : json.dumps(linkovi),
             'raspored' : json.dumps(raspored),
             'grupe' : json.dumps(grupe),
