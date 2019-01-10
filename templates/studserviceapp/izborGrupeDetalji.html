@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Izbor grupe detalji</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+</head>
+<body>
+	<form action="{% url 'izborGrupeDetalji' %}" method="post" id="forma">
+		{% csrf_token %}
+		<select name="tip_pretrage">
+			<option value="imePrezime">Ime i prezime </option>
+			<option value="brojIndeksa"> Broj indeksa </option>
+		</select>
+		<input type="text" name="unos" id="unos" required/>
+		<input type="submit" />
+	</form>
+</body>
+</html>

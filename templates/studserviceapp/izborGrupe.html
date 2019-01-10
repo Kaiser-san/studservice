@@ -1,17 +1,42 @@
+{% extends 'studserviceapp/navbar.html' %}
+{% block navbarcontent %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Izbor grupe ({{username}})</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <style type="text/css" media="screen">
+    * {
+    	padding : 3px;
+    }
+    	.right {
+    		background-color: cyan;
+    	}
+
+    	#forma {
+    	}
+		
+		h1 {
+		}
+
+    </style>
 </head>
 <body>
-	<form action="{% url 'izaberiGrupu' %}" method="post">
+
+	<div class="container">
+		<div class="row">
+			<h1> Izbor grupe </h1>
+		</div>
+		<form action="{% url 'izaberiGrupu' %}" method="post" id="forma">
 		{% csrf_token %}
-	    <table border="1">
-	    	<tr>
-	    		<td> Indeks </td>
-	    		<td> 
-		    		<select name="oznaka_semestra" required>
+		<div class="row">
+			<div class="col-3 right">
+				Indeks
+			</div>
+			<div class="col-3">
+				<select name="oznaka_semestra" required>
 		    			{% for smer in smerovi %}
 		    			<option value='{{smer}}' {% if student.smer == '{{smer}}' %} selected {% endif %}>{{smer}}</option>
 		    			{% endfor %}
@@ -23,75 +48,103 @@
 						<option value="{{godina}}" {% if student.godina_upisa == '{{godina}}' %} selected {% endif %}>{{godina}}</option>
 		            	{% endfor %}
 		            </select>
-		            	 
-        		</td> 
-	    	</tr>
-	    	<tr>
-	    		<td> Ime </td>
-	    		<td> <input type="text" rows="1" cols="20" name="ime" value = '{{ student.ime }}' required /> </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Prezime </td>
-	    		<td> <input type="text" rows="1" cols="20" name="prezime" value = '{{student.prezime}}' required /> </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Broj do sada ukupno ostvarenih ESPB </td>
-	    		<td> <input type="text" rows="1" cols="5" name="broj_ostvarenih_ESPB" size="3" required /> </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Skolske {{skolska_godina_pocetak}}/{{skolska_godina_kraj}} godine upisujem ESPB </td>
-	    		<td> <input type="text" rows="1" cols="5" name="broj_ESPB_upisanih" size="3" required /> </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Broj do sada polozenih ispita </td>
-	    		<td> <input type="text" rows="1" cols="5" name="broj_polozenih_ispita" size="3" required /> </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Semestar </td>
-	    		<td>
-	    			{% for sm in semestri %}
-	    			<input type="radio" name="semestar" value='{{sm}}'> {{sm}} </input>
-	    			{% endfor %}
-	    		 </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Prvi put upisuje semestar </td>
-	    		<td>
-	    			<input type="radio" name="prvi_put_upisuje" value="Da"> Da </input>
-	    			<input type="radio" name="prvi_put_upisuje" value="Ne"> Ne </input> 
-	    		 </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Grupa koju student bira </td>
-	    		<td> 
-	    			{% for grupa in grupe %}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Ime </div>
+			<div class="col-3"> <input type="text" rows="1" cols="20" name="ime" value = '{{ student.ime }}' required /> </div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Prezime </div>
+			<div class="col-3"> <input type="text" rows="1" cols="20" name="prezime" value = '{{ student.prezime }}' required /> </div>
+		</div>
+		<div class="row"> 
+			<div class="col-3 right"> Broj do sada ukupno ostvarenih ESPB </div>
+			<div class="col-3"> <input type="text" rows="1" cols="5" name="broj_ostvarenih_ESPB" size="3" required /> </div>
+		</div>
+		<div class="row"> 
+			<div class="col-3 right"> Skolske {{skolska_godina_pocetak}}/{{skolska_godina_kraj}} godine upisujem ESPB </div>
+			<div class="col-3"> <input type="text" rows="1" cols="5" name="broj_ESPB_upisanih" size="3" required /> </div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Broj do sada polozenih ispita </div>
+			<div class="col-3"> <input type="text" rows="1" cols="5" name="broj_polozenih_ispita" size="3" required /> </div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Semestar </div>
+			<div class="col-3">
+			{% for sm in semestri %}
+    			<input type="radio" name="semestar" value='{{sm}}'> {{sm}} </input>
+			{% endfor %}
+	   		</div> 
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Prvi put upisuje semestar </div>
+			<div class="col-3">
+				<input type="radio" name="prvi_put_upisuje" value="Da" required> Da </input>
+    			<input type="radio" name="prvi_put_upisuje" value="Ne"required> Ne </input> 
+	    	</div>	  
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Grupa koju student bira </div>
+			<div class="col-3"> 
+				{% for grupa in grupe %}
 	    			<input type="radio" name="izbor_grupe" value="{{grupa.id}}">{{grupa.oznaka_grupe}}</input>
-	    			{% endfor %}
-	    		</td>
-	    	</tr>
-	    	<tr>
-	    		<td> Nepolozeni predmeti iz predhodnih godina </td>
-	    		<td> 
-	            	<select name="predmeti" multiple required>
+    			{% endfor %}
+    		</div>		
+		</div>
+		<div class="row">
+				<div class="col-3 right align-middle "> Nepolozeni predmeti iz predhodnih godina </div>
+				<div class="col-3">
+					<select id="predmeti_input" style="width: 400px" multiple>
 	                	{% for predmet in predmeti %}
 	                	<option value={{predmet.id}}>{{predmet.naziv}}</option>
 	                	{% endfor %}
 	            	</select>
-	            </td>
-	    	</tr>
-	    	<tr>
-	    		<td> Nacin placanja skolarine </td>
-	    		<td>
-	    			<input type="radio" name="nacin_placanja" value="odjednom"> Odjednom </input>
-	    			<input type="radio" name="nacin_placanja" value="na_rate"> Na rate </input>
-	    			<input type="radio" name="nacin_placanja" value="stipendista"> Stipendista </input>
-	    		 </td>
-	    	</tr>
-	    	<tr>
-	    		<td></td>
-	    		<td><input type="submit" value="Sacuvaj"> </td>
-	    	</tr>
-	    </table>	
-	</form>
+					<button id="add_predmet" type="button"> V </button>
+					<button id="remove_predmet" type="button"> ^ </button>
+	            	<select name="predmeti" id="predmeti_output" style="width: 400px	;" multiple>
+	            	</select>
+	            </div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Nacin placanje skolarine </div>
+			<div class="col-3"> 
+				<input type="radio" name="nacin_placanja" value="odjednom"> Odjednom </input>
+	    		<input type="radio" name="nacin_placanja" value="na_rate"> Na rate </input>
+	    		<input type="radio" name="nacin_placanja" value="stipendista"> Stipendista </input>
+	    	</div>
+		</div>
+		<div class="row">
+			<div class="col-3"></div>
+			<div class="col-3">
+				<input type="submit" value="Sacuvaj">
+			</div>
+		</div>
+		</form>
+	</div>
+
+	<script>
+		$(document).ready(function() {
+			$("#add_predmet").click(function() {
+				let predmeti = $("#predmeti_input option:selected");
+				$("#predmeti_output").append($(predmeti).clone());
+				$(predmeti).remove();
+			});
+
+			$("#remove_predmet").click(function() {
+				let predmeti = $("#predmeti_output option:selected");
+				$("#predmeti_input").append($(predmeti).clone());
+				$(predmeti).remove();
+			});
+
+			$("#forma").submit(function() {
+				 $('#predmeti_output option').attr('selected', 'selected');
+				 return true;
+			});
+		})
+	</script>	
 </body>
 </html>
+
+{% endblock %}

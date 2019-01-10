@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Izbor grupe {{ime}} {{prezime}}</title>
+	 <style type="text/css" media="screen">
+    * {
+    	padding : 3px;
+    }
+    	.right {
+    		background-color: cyan;
+    	}
+
+    	#forma {
+    	}
+		
+		h1 {
+		}
+
+    </style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<h1> Izbor grupe detalji</h1>
+		</div>
+		<div class="row">
+			<div class="col-3 right">
+				Indeks
+			</div>
+			<div class="col-3">
+				{{indeks}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Ime </div>
+			<div class="col-3">{{ime}}</div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Prezime </div>
+			<div class="col-3">{{prezime}} </div>
+		</div>
+		<div class="row"> 
+			<div class="col-3 right"> Broj do sada ukupno ostvarenih ESPB </div>
+			<div class="col-3"> {{broj_ESPB}} </div>
+		</div>
+		<div class="row"> 
+			<div class="col-3 right"> Skolske {{skolska_godina_pocetak}}/{{skolska_godina_kraj}} godine upisujem ESPB </div>
+			<div class="col-3"> {{upisujem_ESPB}} </div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Broj do sada polozenih ispita </div>
+			<div class="col-3"> {{br_polozenih_ispita}} </div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Semestar </div>
+			<div class="col-3"> {{ semestar }} </div> 
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Prvi put upisuje semestar </div>
+			<div class="col-3"> {{ prvi_put_upisuje_semestar }}</div>	  
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Grupa koju student bira </div>
+			<div class="col-3"> {{ izabrana_grupa }} </div>		
+		</div>
+		<div class="row">
+				<div class="col-3 right align-middle "> Nepolozeni predmeti iz predhodnih godina </div>
+				<div class="col-3">
+					<select id="predmeti_input" style="width: 400px" multiple>
+	                	{% for predmet in nepolozeni_predmeti %}
+	                	<option>{{predmet}}</option>
+	                	{% endfor %}
+	            	</select>
+	            </div>
+		</div>
+		<div class="row">
+			<div class="col-3 right"> Nacin placanja skolarine </div>
+			<div class="col-3"> {{nacin_pacanja_skolarine}}</div>
+		</div>
+	</div>
+</body>
+</html>
