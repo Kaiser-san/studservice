@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lista grupa</title>
+    <title>Podaci studenta</title>
     <style>
         /* Below line is used for online Google font */
         @import "http://fonts.googleapis.com/css?family=Ubuntu";
@@ -47,7 +47,7 @@
         }
         textarea{
         width:400px;
-        height:100px;
+        height:400px;
         padding:10px;
         margin-top:10px;
         margin-bottom:35px;
@@ -74,16 +74,22 @@
 <body>
     <div id="main">
     <div id="first">
-        {% for key, value in predmeti.items %}
-            <h1>{{key}}:</h1>
-            <br/>
-            {% for grupa in value %}
-                <a href="{% url 'izbornaGrupaList' grupa.oznaka_grupe %}">{{grupa.oznaka_grupe}}</a>
-                <br/>
-            {% endfor %}
-        {% endfor %}
+    <form action="{% url 'unesiObavestenje' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Obavestenje:</label>
+        <br>
+        <textarea name="tekst" placeholder="Obavestenje"> </textarea>
+        <br>
+        <label>Fajl:</label>
+        <br>
+        <input type="file" name="fajl">
+        <br>
+        <input type="submit" value="Snimi">
+        <input type="hidden" name="nalog" value={{nalog}} />
+    </form>
     </div>
     </div>
 </body>
 </html>
+
 {% endblock %}

@@ -5,58 +5,118 @@
 <head>
     <meta charset="UTF-8">
     <title>Podaci studenta</title>
+    <style>
+        /* Below line is used for online Google font */
+        @import "http://fonts.googleapis.com/css?family=Ubuntu";
+        body{
+        margin:0;
+        padding:0;
+        font-family:'Ubuntu',sans-serif;
+        background-color:lightgrey;
+        }
+        #main{
+        width:50%;
+        height:50%;
+        margin:30px auto
+        }
+        #first{
+        width:80%;
+        height:1920px;
+        box-shadow:0 0 0 1px rgba(14,41,57,0.12),0 2px 5px rgba(14,41,57,0.44),inset 0 -1px 2px rgba(14,41,57,0.15);
+        float:left;
+        padding:10px 50px 0;
+        background:linear-gradient(#fff,#f2f6f9)
+        }
+        hr{
+        border:0;
+        border-top:1px solid #ccc;
+        margin-bottom:30px;
+        }
+        label{
+        font-size:17px
+        }
+        input{
+        width:400px;
+        padding:10px;
+        margin-top:10px;
+        margin-bottom:35px;
+        border-radius:5px;
+        border:1px solid #cbcbcb;
+        box-shadow:inset 0 1px 2px rgba(0,0,0,0.18);
+        font-size:16px
+        }
+        textarea{
+        width:400px;
+        height:100px;
+        padding:10px;
+        margin-top:10px;
+        margin-bottom:35px;
+        border-radius:5px;
+        border:1px solid #cbcbcb;
+        box-shadow:inset 0 1px 2px rgba(0,0,0,0.18);
+        font-size:16px
+        }
+        input[type=submit]{
+        background:linear-gradient(to bottom,#22abe9 5%,#36caf0 100%);
+        box-shadow:inset 0 1px 0 0 #7bdcf4;
+        border:1px solid #0F799E;
+        color:#fff;
+        font-size:19px;
+        font-weight:700;
+        cursor:pointer;
+        text-shadow:0 1px 0 #13506D
+        }
+        input[type=submit]:hover{
+        background:linear-gradient(to bottom,#36caf0 5%,#22abe9 100%)
+        }
+    </style>
 </head>
 <body>
+    <div id="main">
+    <div id="first">
     <form action="{% url 'uploadSliku' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <table border="1">
-        <tbody>
-        <tr>
-        <td>Ime:</td>
-        <td>{{student.ime}} {{student.prezime}}</td>
-        </tr>
-        <tr>
-        <td>Broj indeksa:</td>
-        <td>{{student.broj_indeksa}}</td>
-        </tr>
-        <tr>
-        <td>Godina upisa:</td>
-        <td>{{student.godina_upisa}}</td>
-        </tr>
-        <tr>
-        <td>Smer:</td>
-        <td>{{student.smer}}</td>
-        </tr>
-        <tr>
-        <td>Nalog:</td>
-        <td>{{student.nalog.username}}</td>
-        </tr>
-        <tr>
-        <td>Grupa:</td>
-        <td>{{student.grupa.oznaka_grupe}}</td>
-        </tr>
-        <tr>
-        <td>Slika:</td>
-        <td>
+        <label>Ime:</label>
+        <br>
+        <input type="text" readonly value="{{student.ime}} {{student.prezime}}">
+        <br>
+        <label>Broj indeksa:</label>
+        <br>
+        <input type="text" readonly value="{{student.broj_indeksa}}">
+        <br>
+        <label>Godina upisa:</label>
+        <br>
+        <input type="text" readonly value="{{student.godina_upisa}}">
+        <br>
+        <label>Smer:</label>
+        <br>
+        <input type="text" readonly value="{{student.smer}}">
+        <br>
+        <label>Nalog:</label>
+        <br>
+        <input type="text" readonly value="{{student.nalog.username}}">
+        <br>
+        <label>Grupa:</label>
+        <br>
+        <input type="text" readonly value="{{oznaka_grupe}}">
+        <br>
+        <label>Slika:</label>
+        <br>
             {% block content %}
             {% ifnotequal slikaURL '' %}
             <img src="{{ slikaURL }}">
             {% endifnotequal %}
             {% endblock %}
-        </td>
-        </tr>
-        <tr>
-        <td>Upload:</td>
-        <td>
-            <input type="file" name="pic" accept="image/*">
-        </td>
-        </tr>
-        </tbody>
-        </table>
+            <br>
+        <label>Upload:</label>
+        <br>
+        <input type="file" name="pic" accept="image/*">
         <br>
         <input type="submit" value="Snimi">
         <input type="hidden" name="nalog" value={{student.nalog.username}} />
     </form>
+    </div>
+    </div>
 </body>
 </html>
 

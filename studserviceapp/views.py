@@ -41,17 +41,24 @@ def timetableforuser(request, username):
     return HttpResponse("Dobrodošli na studentski servis, raspored za %s %s: <br/>%s" % (profil.ime,profil.prezime,raspored))
 
 def newGroup(request):
-    context = { 'predmeti' : Predmet.objects.all() }
+    predmetiSemestar = {}
+    for semestar in range(1,9):
+        predmetiSemestar[semestar] = []
+        for predmet in Predmet.objects.all():
+            if(predmet.semestar_po_programu==semestar):
+                predmetiSemestar[semestar].append(predmet.naziv)
+    context = { 'predmeti' : Predmet.objects.all(), 'predmetiSemestar' : json.dumps(predmetiSemestar)}
     return render(request, 'studserviceapp/newGroup.html', context)
 
 def addGroup(request):
-    aktivna = False
-    if 'aktivna' in request.POST and request.POST['aktivna']:
-        aktivna = True
-    izbornaGrupa = IzbornaGrupa(oznaka_grupe=request.POST['oznaka_grupe'], oznaka_semestra=request.POST['oznaka_semestra'], kapacitet=request.POST['kapacitet'], smer=request.POST['smer'], aktivna=aktivna, za_semestar=Semestar.objects.get(id = request.POST['za_semestar']))
-    izbornaGrupa.save()
-    for predmet_id in request.POST.getlist('predmeti'):
-        izbornaGrupa.predmeti.add(Predmet.objects.get(id=predmet_id))
+    for oznaka_grupe in request.POST['oznaka_grupe'].split(';'):
+        aktivna = False
+        if 'aktivna' in request.POST and request.POST['aktivna']:
+            aktivna = True
+        izbornaGrupa = IzbornaGrupa(oznaka_grupe=oznaka_grupe, oznaka_semestra=request.POST['oznaka_semestra'], kapacitet=request.POST['kapacitet'], smer=request.POST['smer'], aktivna=aktivna, za_semestar=Semestar.objects.get(id = request.POST['za_semestar']))
+        izbornaGrupa.save()
+        for predmet_id in request.POST.getlist('predmeti'):
+            izbornaGrupa.predmeti.add(Predmet.objects.get(id=predmet_id))
     return HttpResponse("Uspesno dodata grupa")
 
 def izaberiGrupu(request):
@@ -164,7 +171,7 @@ def podaciStudenta(request, username):
     slikaUrl = ''
     if student.slika.name:
         slikaUrl = student.slika.url
-    context = { 'student' : student, 'slikaURL' : slikaUrl,'linkovi':get_linkovi(username)}
+    context = { 'student' : student, 'slikaURL' : slikaUrl,'linkovi':get_linkovi(username), 'oznaka_grupe':student.grupa.get().oznaka_grupe}
     return render(request, 'studserviceapp/podaciStudenta.html', context)
 
 def uploadSliku(request):
@@ -186,10 +193,11 @@ def predajeStudentima(request, username):
         for izbornaGrupa in IzbornaGrupa.objects.all():
             if predmet in izbornaGrupa.predmeti.all():
                 context['predmeti'][predmet.naziv].append(izbornaGrupa)
+    context['linkovi'] = get_linkovi(username)
     return render(request, 'studserviceapp/predajeStudentima.html', context)
 
 def izbornaGrupaList(request, group):
-    studenti = " "
+    studenti = {}
     for student in Student.objects.all():
         try:
             izborGrupe = IzborGrupe.objects.get(student=student)
@@ -198,10 +206,11 @@ def izbornaGrupaList(request, group):
         izbornaGrupa = IzbornaGrupa.objects.get(oznaka_grupe=izborGrupe.izabrana_grupa.oznaka_grupe)
         if(izbornaGrupa.oznaka_grupe==group):
             if student.slika and hasattr(student.slika, 'url'):
-                studenti += "<a href=" + student.slika.url + ">" + student.ime + "</a><br/>"
+                studenti[student.ime] = student.slika.url
             else:
-                studenti += student.ime + "<br/>"
-    return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))
+                studenti[student.ime] = ''
+    context = {'oznaka_grupe' : group, 'studenti' : studenti}
+    return render(request, "studserviceapp/izbornaGrupaList.html", context)
 
 def submitRasporedPolaganja(request):
     return render(request,'studserviceapp/submitRasporedPolaganja.html')
@@ -374,16 +383,19 @@ def get_linkovi(username):
         linkovi['Predaje Studentima'] = 'http://127.0.0.1:8000/studserviceapp/predajeStudentima/' + username
         linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + username
     elif(nalog.uloga == 'sekretar'):
-        linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/unosObavestenja/' + username
         linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + username
         linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe'
         linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList'
+        linkovi['Detalji Izbora Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborGrupeDetalji'
     else:
-        linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Unos Rasporeda'] = 'http://127.0.0.1:8000/studserviceapp/submitRasporedPolaganja'
+        linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/unosObavestenja/' + username
         linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + username
         linkovi['Unos Grupe'] = 'http://127.0.0.1:8000/studserviceapp/newGroup'
         linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe'
         linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList'
+        linkovi['Detalji Izbora Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborGrupeDetalji'
     return linkovi
 
 def home(request, username):
@@ -451,7 +463,7 @@ def home(request, username):
         fajl = ''
         if obavestenje.fajl.name:
             fajl = obavestenje.fajl.url
-        obavestenja.append([obavestenje.postavio, obavestenje.datum_postavljanja.strftime("%Y-%m-%d %H:%M:%S"), obavestenje.tekst, fajl])
+        obavestenja.append([obavestenje.postavio.username, obavestenje.datum_postavljanja.strftime("%Y-%m-%d %H:%M:%S"), obavestenje.tekst, fajl])
 
     context = \
         {
@@ -498,3 +510,34 @@ def izborGrupeDetalji(request):
 
         }
         return render(request,'studserviceapp/izborGrupeDetalji_request.html',context)
+
+def unosObavestenja(request, nalog):
+    predmetiSemestar = {}
+    for semestar in range(1,9):
+        predmetiSemestar[semestar] = []
+    for predmet in Predmet.objects.all():
+        predmetiSemestar[predmet.semestar_po_programu].append(predmet.naziv)
+    context = { 'predmeti' : Predmet.objects.all(), 'predmetiSemestar' : json.dumps(predmetiSemestar), 'linkovi' : get_linkovi(nalog), 'nalog' : Nalog.objects.get(username = nalog).id}
+    return render(request, 'studserviceapp/unosObavestenja.html', context)
+
+import datetime
+def unesiObavestenje(request):
+
+    obavestenje = Obavestenje(datum_postavljanja=datetime.datetime.now(), tekst=request.POST['tekst'], postavio_id=request.POST['nalog'])
+    fajl = request.FILES['fajl']
+    fs = FileSystemStorage()
+    filename = fs.save(fajl.name, fajl)
+    obavestenje.fajl = fs.url(filename)
+    obavestenje.save()
+    return HttpResponse("Uspesno dodato obavestenje")
+
+def izborneGrupe(request):
+    grupeSemestar = {}
+    for semestar in range(1,9):
+        grupeSemestar[semestar] = []
+    grupeSmer = { 'RN' : [], 'RM' : []}
+    for grupa in IzbornaGrupa.objects.all():
+        grupeSemestar[grupa.oznaka_semestra].append(grupa.oznaka_grupe)
+        grupeSmer[grupa.smer].append(grupa.oznaka_grupe)
+    context = { 'izborneGrupe' : IzbornaGrupa.objects.all() , 'grupeSemestar' : grupeSemestar, 'grupeSmer' : grupeSmer}
+    return render(request, 'studserviceapp/izborneGrupe.html', context)

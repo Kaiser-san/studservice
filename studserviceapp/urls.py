@@ -37,7 +37,10 @@ urlpatterns = [
     path('submitRasporedPolaganja', views.submitRasporedPolaganja, name='submitRasporedPolaganja'),
     path('submitRasporedPolaganja/submit', views.do_submitRasporedPolaganja, name='do_submitRasporedPolaganja'),
     path('home/<str:username>', views.home, name='home'),
-    path('izborGrupeDetalji',views.izborGrupeDetalji,name="izborGrupeDetalji")
+    path('izborGrupeDetalji',views.izborGrupeDetalji,name="izborGrupeDetalji"),
+    path('unosObavestenja/<str:nalog>',views.unosObavestenja,name="unosObavestenja"),
+    path('unesiObavestenje',views.unesiObavestenje,name="unesiObavestenje"),
+    path('izborneGrupe',views.izborneGrupe,name="izborneGrupe")
 ]
 
 from django.conf import settings
