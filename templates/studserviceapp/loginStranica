@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lista studenata za {{grupa}}</title>
+    <title>Lista grupa</title>
+
     <style>
         /* Below line is used for online Google font */
         @import "http://fonts.googleapis.com/css?family=Ubuntu";
@@ -19,7 +20,7 @@
         }
         #first{
         width:80%;
-        height:1920px;
+        height:500px;
         box-shadow:0 0 0 1px rgba(14,41,57,0.12),0 2px 5px rgba(14,41,57,0.44),inset 0 -1px 2px rgba(14,41,57,0.15);
         float:left;
         padding:10px 50px 0;
@@ -33,19 +34,9 @@
         label{
         font-size:17px
         }
+
         input{
-        width:400px;
-        padding:10px;
-        margin-top:10px;
-        margin-bottom:35px;
-        border-radius:5px;
-        border:1px solid #cbcbcb;
-        box-shadow:inset 0 1px 2px rgba(0,0,0,0.18);
-        font-size:16px
-        }
-        textarea{
-        width:400px;
-        height:100px;
+        width:135px;
         padding:10px;
         margin-top:10px;
         margin-bottom:35px;
@@ -70,13 +61,20 @@
     </style>
 </head>
 <body>
+
     <div id="main">
     <div id="first">
-        <h2>Spisak studenata za grupu {{grupa}} :</h2>
-        <br/>
-        {% for student in studenti %}
-            <h4>{{student.ime}}  {{student.prezime}}  {{student.smer}}  {{student.broj_indeksa}}\{{student.godina_upisa}}</h4>
-        {% endfor %}
+    {% csrf_token %}
+    <br>
+    <br>
+    <br>
+    <br>
+    <label>Unesite Username:</label>
+    <br>
+    <input type="text" name="username">
+    <br>
+    <input type="submit" value="Potvrdi">
+    <br>
     </div>
     </div>
 </body>

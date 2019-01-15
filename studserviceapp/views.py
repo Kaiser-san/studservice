@@ -16,7 +16,8 @@ from .parse_raspored_polaganja import import_data
 from .send_gmail import create_and_send_message
 
 def index(request):
-    return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
+    return render(request, 'studserviceapp/loginStranica')
+    #return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
 
 def timetableforuser(request, username):
     raspored=" "
