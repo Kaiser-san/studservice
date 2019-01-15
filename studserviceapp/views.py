@@ -151,19 +151,40 @@ def changedGroup(request):
     return HttpResponse("Uspesna izmena grupe")
 
 def groupList(request):
-    context = {'grupe' : Grupa.objects.all(),
-               'studenti' : Student.objects.all()}
+    grupe = []
+    for g in Grupa.objects.all():
+        grupe.append(g)
+    grupe.sort(key = lambda x : x.oznaka_grupe)
+    grupePrva = []
+    grupeDruga = []
+    grupeTreca = []
+    grupeCetvrta = []
+    for g in grupe:
+        if g.oznaka_grupe[0] == '1':
+            grupePrva.append(g)
+        elif g.oznaka_grupe[0] == '2':
+            grupeDruga.append(g)
+        elif g.oznaka_grupe[0] == '3':
+            grupeTreca.append(g)
+        else:
+            grupeCetvrta.append(g)
+    context = { 'g1' : grupePrva,
+                'g2' : grupeDruga,
+                'g3' : grupeTreca,
+                'g4' : grupeCetvrta}
     return render(request,'studserviceapp/groupList.html',context)
 
-def groupStudents(request,group):
-    studenti = " "
-    grupa = Grupa.objects.get(oznaka_grupe=group)
-
+def groupStudents(request):
+    studenti = []
+    group_id = int(request.POST['grupa'])
     for student in Student.objects.all():
-        grupa = Grupa.objects.get(id = Student.grupa.through.objects.get(student_id=(Student.objects.get(nalog=student.nalog)).id).grupa_id)
-        if(grupa.oznaka_grupe==group):
-            studenti += "%s %s %s %s\\%s <br/>" % (student.ime, student.prezime, student.smer, student.broj_indeksa,(student.godina_upisa%100))
-    return HttpResponse("Spisak studenata za grupu %s : <br/> %s" % (group, studenti))
+        grupa = Grupa.objects.get(id = Student.grupa.through.objects.get(student_id=student.id).grupa_id)
+        if(grupa.id == group_id):
+            studenti.append(student)
+    grupa = Grupa.objects.get(id = group_id).oznaka_grupe
+    context = { 'studenti' : studenti,
+                'grupa'    : grupa}
+    return render(request,'studserviceapp/grupaStudenti.html', context)
 
 def podaciStudenta(request, username):
     studentNalog = Nalog.objects.get(username = username)
@@ -307,9 +328,10 @@ def sendMail(request, username):
                 'uloga' : uloga,
                 'opcije_predmeti' : opcije_predmeti,
                 'opcije_grupe' : opcije_grupe,
-                'opcije_smer' : opcije_smer}
+                'opcije_smer' : opcije_smer,
+                'linkovi': get_linkovi(username)}
 
-    return render(request,'studserviceapp/mailForm.html',context)
+    return render(request,'studserviceapp/mailForma.html',context)
 
 def mailSent(request):
     to_list = []

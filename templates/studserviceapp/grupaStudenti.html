@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista grupa</title>
-
     <style>
         /* Below line is used for online Google font */
         @import "http://fonts.googleapis.com/css?family=Ubuntu";
@@ -20,7 +19,7 @@
         }
         #first{
         width:80%;
-        height:850px;
+        height:1920px;
         box-shadow:0 0 0 1px rgba(14,41,57,0.12),0 2px 5px rgba(14,41,57,0.44),inset 0 -1px 2px rgba(14,41,57,0.15);
         float:left;
         padding:10px 50px 0;
@@ -34,9 +33,19 @@
         label{
         font-size:17px
         }
-
         input{
-        width:135px;
+        width:400px;
+        padding:10px;
+        margin-top:10px;
+        margin-bottom:35px;
+        border-radius:5px;
+        border:1px solid #cbcbcb;
+        box-shadow:inset 0 1px 2px rgba(0,0,0,0.18);
+        font-size:16px
+        }
+        textarea{
+        width:400px;
+        height:100px;
         padding:10px;
         margin-top:10px;
         margin-bottom:35px;
@@ -58,46 +67,16 @@
         input[type=submit]:hover{
         background:linear-gradient(to bottom,#36caf0 5%,#22abe9 100%)
         }
-        select{
-        padding: 8px 16px;
-        border: 1px solid transparent;
-        border-color: transparent transparent rgba(1, 1, 1, 1) transparent;
-        border-radius:5px;
-        text-shadow:0 1px 0 #13506D
-        }
     </style>
 </head>
 <body>
-
     <div id="main">
     <div id="first">
-    <form action="{% url 'groupStudents' %}" method="post">
-    {% csrf_token %}
-    <br>
-    <br>
-    <br>
-    <br>
-    <label>Odaberite Grupu:</label>
-    <select name="grupa">
-    <optgroup label="I Godina">
-	{% for grupa in g1 %}<option value={{grupa.id}}> {{grupa.oznaka_grupe}} </option>{% endfor %}
-	</optgroup>
-    <optgroup label="II Godina">
-	{% for grupa in g2 %}<option value={{grupa.id}}> {{grupa.oznaka_grupe}} </option>{% endfor %}
-	</optgroup>
-    <optgroup label="III Godina">
-	{% for grupa in g3 %}<option value={{grupa.id}}> {{grupa.oznaka_grupe}} </option>{% endfor %}
-	</optgroup>
-    <optgroup label="IV Godina">
-	{% for grupa in g4 %}<option value={{grupa.id}}> {{grupa.oznaka_grupe}} </option>{% endfor %}
-	</optgroup>
-    </select>
-    <br>
-    <br>
-    <input type="submit" value="Potvrdi">
-    <br>
-    <br>
-	</form>
+        <h2>Spisak studenata za grupu {{grupa}} :</h2>
+        <br/>
+        {% for student in studenti %}
+            <h4>{{student.ime}}  {{student.prezime}}  {{student.smer}}  {{student.broj_indeksa}}\{{student.godina_upisa}}</h4>
+        {% endfor %}
     </div>
     </div>
 </body>
