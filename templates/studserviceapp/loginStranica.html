@@ -61,9 +61,9 @@
     </style>
 </head>
 <body>
-
     <div id="main">
     <div id="first">
+    <form action="{% url 'loginResponse' %}" method="post">
     {% csrf_token %}
     <br>
     <br>
@@ -75,6 +75,7 @@
     <br>
     <input type="submit" value="Potvrdi">
     <br>
+    </form>
     </div>
     </div>
 </body>

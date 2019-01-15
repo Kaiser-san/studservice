@@ -16,7 +16,7 @@ from .parse_raspored_polaganja import import_data
 from .send_gmail import create_and_send_message
 
 def index(request):
-    return render(request, 'studserviceapp/loginStranica')
+    return render(request, 'studserviceapp/loginStranica.html')
     #return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
 
 def timetableforuser(request, username):
@@ -420,6 +420,10 @@ def get_linkovi(username):
         linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList'
         linkovi['Detalji Izbora Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborGrupeDetalji'
     return linkovi
+
+def loginResponse(request):
+    username = request.POST['username']
+    return home(request,username)
 
 def home(request, username):
     nalog = Nalog.objects.get(username = username)
