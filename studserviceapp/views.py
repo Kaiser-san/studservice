@@ -17,30 +17,7 @@ from .send_gmail import create_and_send_message
 
 def index(request):
     return render(request, 'studserviceapp/loginStranica.html')
-    #return HttpResponse("Dobrodošli na studentski servis<br/>Za dodavanje grupe idite na http://127.0.0.1:8000/studserviceapp/newGroup<br/>Za menjanje grupe idite na http://127.0.0.1:8000/studserviceapp/changeGroup/[OZNAKA GRUPE]<br/>Za upis idite na http://127.0.0.1:8000/studserviceapp/izborgrupe/[NALOG]<br/>Za liste grupa idite na http://127.0.0.1:8000/studserviceapp/groupList<br/>Za raspored http://127.0.0.1:8000/studserviceapp/timetable/[NALOG]")
-
-def timetableforuser(request, username):
-    raspored=" "
-    termini = Termin.objects.all()
-    nalog = Nalog.objects.get(username = username)
-    if(nalog.uloga == "student"):
-        profil = Student.objects.get(nalog=nalog)
-        grupaID = Student.grupa.through.objects.get(student_id=profil.id).grupa_id
-        grupa = Grupa.objects.get(id = grupaID)
-        for j in range(len(termini)):
-            if grupa in termini[j].grupe.all():
-               string = "%s %s %s %s %s %s %s %s<br/>" % (termini[j].oznaka_ucionice,termini[j].predmet.naziv,termini[j].tip_nastave,termini[j].nastavnik.ime,termini[j].nastavnik.prezime,termini[j].pocetak,termini[j].zavrsetak,termini[j].dan)
-               raspored += string
-    else:
-        profil = Nastavnik.objects.get(nalog=nalog)
-        predmeti = profil.predmet.all()
-        for i in range(len(predmeti)):
-        	for j in range(len(termini)):
-        		if(predmeti[i]==termini[j].predmet):
-        			string = "%s %s %s %s %s %s<br/>" % (termini[j].oznaka_ucionice,predmeti[i].naziv,termini[j].tip_nastave,termini[j].pocetak,termini[j].zavrsetak,termini[j].dan)
-        			raspored+=string
-    return HttpResponse("Dobrodošli na studentski servis, raspored za %s %s: <br/>%s" % (profil.ime,profil.prezime,raspored))
-
+    
 def newGroup(request, username):
     predmetiSemestar = {}
     for semestar in range(1,9):
