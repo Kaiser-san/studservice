@@ -24,24 +24,26 @@ urlpatterns = [
     path('mail/<str:username>', views.sendMail , name='mail'),
     path('changeGroup/<str:grupa>', views.changeGroup, name='changeGroup'),
     path('groupStudents', views.groupStudents, name='groupStudents'),
-    path('newGroup', views.newGroup, name='newGroup'),
+    path('newGroup/<str:username>', views.newGroup, name='newGroup'),
     path('addGroup', views.addGroup, name='addGroup'),
     path('izaberiGrupu',views.izaberiGrupu, name='izaberiGrupu'),
     path('changedGroup', views.changedGroup, name='changedGroup'),
-    path('groupList', views.groupList, name='groupList'),
+    path('groupList/<str:username>', views.groupList, name='groupList'),
     path('mailSent', views.mailSent, name='mailSent'),
     path('podaciStudenta/<str:username>', views.podaciStudenta , name='podaciStudenta'),
     path('uploadSliku', views.uploadSliku , name='uploadSliku'),
     path('predajeStudentima/<str:username>', views.predajeStudentima , name='predajeStudentima'),
     path('izbornaGrupaList/<str:group>', views.izbornaGrupaList , name='izbornaGrupaList'),
-    path('submitRasporedPolaganja', views.submitRasporedPolaganja, name='submitRasporedPolaganja'),
+    path('submitRasporedPolaganja/<str:username>', views.submitRasporedPolaganja, name='submitRasporedPolaganja'),
     path('submitRasporedPolaganja/submit', views.do_submitRasporedPolaganja, name='do_submitRasporedPolaganja'),
     path('loginResponse', views.loginResponse, name='loginResponse'),
     path('home/<str:username>', views.home, name='home'),
-    path('izborGrupeDetalji',views.izborGrupeDetalji,name="izborGrupeDetalji"),
+    path('izborGrupeDetalji/<str:username>',views.izborGrupeDetalji,name="izborGrupeDetalji"),
+    path('izborGrupeDetalji_request',views.izborGrupeDetalji_request,name="izborGrupeDetalji_request"),
     path('unosObavestenja/<str:nalog>',views.unosObavestenja,name="unosObavestenja"),
     path('unesiObavestenje',views.unesiObavestenje,name="unesiObavestenje"),
-    path('izborneGrupe',views.izborneGrupe,name="izborneGrupe")
+    path('izborneGrupe/<str:username>',views.izborneGrupe,name="izborneGrupe"),
+    path('ceoRaspored/<str:username>',views.ceoRaspored,name="ceoRaspored")
 ]
 
 from django.conf import settings

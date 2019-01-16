@@ -41,14 +41,14 @@ def timetableforuser(request, username):
         			raspored+=string
     return HttpResponse("Dobrodošli na studentski servis, raspored za %s %s: <br/>%s" % (profil.ime,profil.prezime,raspored))
 
-def newGroup(request):
+def newGroup(request, username):
     predmetiSemestar = {}
     for semestar in range(1,9):
         predmetiSemestar[semestar] = []
         for predmet in Predmet.objects.all():
             if(predmet.semestar_po_programu==semestar):
                 predmetiSemestar[semestar].append(predmet.naziv)
-    context = { 'predmeti' : Predmet.objects.all(), 'predmetiSemestar' : json.dumps(predmetiSemestar)}
+    context = { 'predmeti' : Predmet.objects.all(), 'predmetiSemestar' : json.dumps(predmetiSemestar), 'linkovi' : get_linkovi(username)}
     return render(request, 'studserviceapp/newGroup.html', context)
 
 def addGroup(request):
@@ -151,7 +151,7 @@ def changedGroup(request):
             izbornaGrupa.predmeti.add(Predmet.objects.get(id=predmet_id))
     return HttpResponse("Uspesna izmena grupe")
 
-def groupList(request):
+def groupList(request, username):
     grupe = []
     for g in Grupa.objects.all():
         grupe.append(g)
@@ -172,16 +172,21 @@ def groupList(request):
     context = { 'g1' : grupePrva,
                 'g2' : grupeDruga,
                 'g3' : grupeTreca,
-                'g4' : grupeCetvrta}
+                'g4' : grupeCetvrta,
+                'linkovi' : get_linkovi(username)}
     return render(request,'studserviceapp/groupList.html',context)
 
 def groupStudents(request):
-    studenti = []
+    studenti = {}
     group_id = int(request.POST['grupa'])
     for student in Student.objects.all():
         grupa = Grupa.objects.get(id = Student.grupa.through.objects.get(student_id=student.id).grupa_id)
         if(grupa.id == group_id):
-            studenti.append(student)
+            studentKey = student.ime + ' ' + student.prezime + ' ' + student.smer + ' ' + str(student.broj_indeksa)+'/'+str(student.godina_upisa)
+            slikaUrl = ''
+            if student.slika.name:
+                slikaUrl = student.slika.url
+            studenti[studentKey] = slikaUrl
     grupa = Grupa.objects.get(id = group_id).oznaka_grupe
     context = { 'studenti' : studenti,
                 'grupa'    : grupa}
@@ -234,8 +239,9 @@ def izbornaGrupaList(request, group):
     context = {'oznaka_grupe' : group, 'studenti' : studenti}
     return render(request, "studserviceapp/izbornaGrupaList.html", context)
 
-def submitRasporedPolaganja(request):
-    return render(request,'studserviceapp/submitRasporedPolaganja.html')
+def submitRasporedPolaganja(request, username):
+    context = { 'linkovi' : get_linkovi(username)}
+    return render(request,'studserviceapp/submitRasporedPolaganja.html', context)
 
 def do_submitRasporedPolaganja(request):
     if 'dokument' in request.FILES:
@@ -397,28 +403,28 @@ def get_linkovi(username):
     linkovi = {}
     linkovi['Home'] = 'http://localhost:8000/studserviceapp/home/'+username
     if(nalog.uloga == 'student'):
-        linkovi['Ceo Raspored'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Ceo Raspored'] = 'http://127.0.0.1:8000/studserviceapp/ceoRaspored/' + username
         linkovi['Podaci Studenta'] = 'http://127.0.0.1:8000/studserviceapp/podaciStudenta/'+username
         if IzbornaGrupa.objects.count() > 0:
             linkovi['Izbor Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborgrupe/'+username
     elif(nalog.uloga == 'nastavnik'):
-        linkovi['Ceo Raspored'] = 'http://127.0.0.1:8000/studserviceapp/raspored'
+        linkovi['Ceo Raspored'] = 'http://127.0.0.1:8000/studserviceapp/ceoRaspored/' + username
         linkovi['Predaje Studentima'] = 'http://127.0.0.1:8000/studserviceapp/predajeStudentima/' + username
         linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + username
     elif(nalog.uloga == 'sekretar'):
         linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/unosObavestenja/' + username
         linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + username
-        linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe'
-        linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList'
-        linkovi['Detalji Izbora Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborGrupeDetalji'
+        linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe/' + username
+        linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList/' + username
+        linkovi['Detalji Izbora Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborGrupeDetalji/' + username
     else:
-        linkovi['Unos Rasporeda'] = 'http://127.0.0.1:8000/studserviceapp/submitRasporedPolaganja'
+        linkovi['Unos Rasporeda'] = 'http://127.0.0.1:8000/studserviceapp/submitRasporedPolaganja/' + username
         linkovi['Unos Obavestenja'] = 'http://127.0.0.1:8000/studserviceapp/unosObavestenja/' + username
         linkovi['Slanje Mejla'] = 'http://127.0.0.1:8000/studserviceapp/mail/' + username
-        linkovi['Unos Grupe'] = 'http://127.0.0.1:8000/studserviceapp/newGroup'
-        linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe'
-        linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList'
-        linkovi['Detalji Izbora Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborGrupeDetalji'
+        linkovi['Unos Grupe'] = 'http://127.0.0.1:8000/studserviceapp/newGroup/' + username
+        linkovi['Izborne Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborneGrupe/' + username
+        linkovi['Spisak Studenata'] = 'http://127.0.0.1:8000/studserviceapp/groupList/' + username
+        linkovi['Detalji Izbora Grupe'] = 'http://127.0.0.1:8000/studserviceapp/izborGrupeDetalji/' + username
     return linkovi
 
 def loginResponse(request):
@@ -503,47 +509,48 @@ def home(request, username):
         }
     return render(request, 'studserviceapp/home.html', context)
 
-def izborGrupeDetalji(request):
-    if(request.method == 'GET'):
-        return render(request,'studserviceapp/izborGrupeDetalji.html')
+def izborGrupeDetalji(request, username):
+    return render(request,'studserviceapp/izborGrupeDetalji.html', {'linkovi' : get_linkovi(username)})
+
+def izborGrupeDetalji_request(request):
+    unos = request.POST['unos']
+    tip = request.POST['tip_pretrage']
+    if(tip == 'imePrezime'):
+        ime,prezime = unos.split(' ')
+        student = Student.objects.get(ime=ime,prezime=prezime)
     else:
-        unos = request.POST['unos']
-        tip = request.POST['tip_pretrage']
-        if(tip == 'imePrezime'):
-            ime,prezime = unos.split(' ')
-            student = Student.objects.get(ime=ime,prezime=prezime)
-        else:
-            student = Student.objects.get(broj_indeksa=unos)
-        izbor_grupe = IzborGrupe.objects.get(student=student)
+        student = Student.objects.get(broj_indeksa=unos)
+    izbor_grupe = IzborGrupe.objects.get(student=student)
 
-        prvi_put_upisuje_semestar = 'DA' if izbor_grupe.prvi_put_upisuje_semestar else 'NE'
+    prvi_put_upisuje_semestar = 'DA' if izbor_grupe.prvi_put_upisuje_semestar else 'NE'
 
-        nepolozeni_predmeti = []
-        for predmet in izbor_grupe.nepolozeni_predmeti.all():
-            nepolozeni_predmeti.append(predmet.naziv)
+    nepolozeni_predmeti = []
+    for predmet in izbor_grupe.nepolozeni_predmeti.all():
+        nepolozeni_predmeti.append(predmet.naziv)
 
-        context = {
-            'indeks' : student.broj_indeksa,
-            'ime'    : student.ime,
-            'prezime' :student.prezime,
-            'broj_ESPB' : izbor_grupe.ostvarenoESPB,
-            'upisujem_ESPB' : izbor_grupe.upisujeESPB,
-            'br_polozenih_ispita': izbor_grupe.broj_polozenih_ispita,
-            'semestar': izbor_grupe.upisuje_semestar,
-            'prvi_put_upisuje_semestar' : prvi_put_upisuje_semestar,
-            'izabrana_grupa' : izbor_grupe.izabrana_grupa.oznaka_grupe,
-            'nepolozeni_predmeti' : nepolozeni_predmeti,
-            'nacin_pacanja_skolarine': izbor_grupe.nacin_placanja
+    context = {
+        'indeks' : student.smer + ' ' + str(student.broj_indeksa) + '/' + str(student.godina_upisa),
+        'ime'    : student.ime,
+        'prezime' :student.prezime,
+        'broj_ESPB' : izbor_grupe.ostvarenoESPB,
+        'upisujem_ESPB' : izbor_grupe.upisujeESPB,
+        'br_polozenih_ispita': izbor_grupe.broj_polozenih_ispita,
+        'semestar': izbor_grupe.upisuje_semestar,
+        'prvi_put_upisuje_semestar' : prvi_put_upisuje_semestar,
+        'izabrana_grupa' : izbor_grupe.izabrana_grupa.oznaka_grupe,
+        'nepolozeni_predmeti' : nepolozeni_predmeti,
+        'nacin_pacanja_skolarine': izbor_grupe.nacin_placanja
 
-        }
-        return render(request,'studserviceapp/izborGrupeDetalji_request.html',context)
+    }
+    return render(request,'studserviceapp/izborGrupeDetalji_request.html',context)
 
 def unosObavestenja(request, nalog):
     predmetiSemestar = {}
     for semestar in range(1,9):
         predmetiSemestar[semestar] = []
     for predmet in Predmet.objects.all():
-        predmetiSemestar[predmet.semestar_po_programu].append(predmet.naziv)
+        if predmet.semestar_po_programu:
+            predmetiSemestar[predmet.semestar_po_programu].append(predmet.naziv)
     context = { 'predmeti' : Predmet.objects.all(), 'predmetiSemestar' : json.dumps(predmetiSemestar), 'linkovi' : get_linkovi(nalog), 'nalog' : Nalog.objects.get(username = nalog).id}
     return render(request, 'studserviceapp/unosObavestenja.html', context)
 
@@ -558,7 +565,7 @@ def unesiObavestenje(request):
     obavestenje.save()
     return HttpResponse("Uspesno dodato obavestenje")
 
-def izborneGrupe(request):
+def izborneGrupe(request, username):
     grupeSemestar = {}
     for semestar in range(1,9):
         grupeSemestar[semestar] = []
@@ -566,5 +573,44 @@ def izborneGrupe(request):
     for grupa in IzbornaGrupa.objects.all():
         grupeSemestar[grupa.oznaka_semestra].append(grupa.oznaka_grupe)
         grupeSmer[grupa.smer].append(grupa.oznaka_grupe)
-    context = { 'izborneGrupe' : IzbornaGrupa.objects.all() , 'grupeSemestar' : grupeSemestar, 'grupeSmer' : grupeSmer}
+    context = { 'izborneGrupe' : IzbornaGrupa.objects.all() , 'grupeSemestar' : grupeSemestar, 'grupeSmer' : grupeSmer, 'linkovi' : get_linkovi(username)}
     return render(request, 'studserviceapp/izborneGrupe.html', context)
+
+def ceoRaspored(request, username):
+    raspored =[]
+    for termin in Termin.objects.all():
+        terminGrupe = termin.grupe.order_by('oznaka_grupe').first().oznaka_grupe
+        for grupa in termin.grupe.order_by('oznaka_grupe'):
+            terminGrupe += ', ' + grupa.oznaka_grupe
+        raspored.append(
+            [termin.predmet.naziv, termin.tip_nastave, termin.nastavnik.ime + " " + termin.nastavnik.prezime,
+             terminGrupe, termin.dan,
+             termin.pocetak.strftime("%H:%M") + '-' + termin.zavrsetak.strftime("%H:%M"),
+             termin.oznaka_ucionice])
+    grupe = []
+    for grupa in Grupa.objects.all():
+        grupe.append(grupa.oznaka_grupe)
+    grupe.sort()
+
+    nastavnici = []
+    for nastavnik in Nastavnik.objects.all():
+        nastavnici.append(nastavnik.ime + ' ' + nastavnik.prezime)
+    nastavnici.sort()
+
+    ucionice = set()
+    for termin in Termin.objects.all():
+        ucionice.add(termin.oznaka_ucionice)
+    ucionice = list(ucionice)
+    ucionice.sort()
+
+    linkovi = get_linkovi(username)
+    context = \
+    {
+        'linkovi' : json.dumps(linkovi),
+        'raspored' : json.dumps(raspored),
+        'grupe' : json.dumps(grupe),
+        'nastavnici' : json.dumps(nastavnici),
+        'ucionice' : json.dumps(ucionice)
+    }
+
+    return render(request,'studserviceapp/ceoRaspored.html', context)

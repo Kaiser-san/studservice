@@ -3,83 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <title>Izmena grupe </title>
+	{% load static %}
+	<link href="{% static formStyle.css %}formStyle.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+    <div id="main">
+    <div id="first">
     <form action="{% url 'changedGroup' %}" method="post">
         {% csrf_token %}
-	    <table border="1">
-        <tbody>
-        <tr>
-        <td>Oznaka grupe:</td>
-        <td><input type="text" rows="1" cols="10" name="oznaka_grupe" value={{grupa.oznaka_grupe}} required/></td>
-        </tr>
-        <tr>
-        <td>Semestar:</td>
-        <td>
-            <select name="oznaka_semestra" required>
-                {% for i in "12345678" %}
-                {% if grupa.oznaka_semestra == forloop.counter0 %}
-                <option value={{forloop.counter0}} selected>{{forloop.counter0}}</option>
-                {% else %}
-                <option value={{forloop.counter0a}}>{{forloop.counter0}}</option>
-                {% endif %}
-                {% endfor %}
-            </select>
-        </td>
-        </tr>
-        <tr>
-        <td>Kapacitet</td>
-        <td><input type="number" rows="1" cols="10" name="kapacitet" value={{grupa.kapacitet}} required/></td>
-        </tr>
-        <tr>
-        <td>Smer:</td>
-        <td>
-            <select name="smer" required>
-                {% if grupa.smer == "RN" %}
-                <option value="RN" selected>RN</option>
-                {% else %}
-                <option value="RN">RN</option>
-                {% endif %}
-                {% if grupa.smer == "RM" %}
-                <option value="RM" selected>RM</option>
-                {% else %}
-                <option value="RM">RM</option>
-                {% endif %}
-            </select>
-        </td>
-        </tr>
-        <tr>
-        <td>Aktivna:</td>
-        <td>
-            {% if grupa.aktivna %}
-            <input type="checkbox" name="aktivna" checked/>
+        <label>Oznaka grupe:</label>
+        <br>
+        <input type="text" rows="1" cols="10" name="oznaka_grupe" value={{grupa.oznaka_grupe}} required/>
+        <br>
+        <label>Semestar:</label>
+        <br>
+        <select name="oznaka_semestra" required>
+            {% for i in "12345678" %}
+            {% if grupa.oznaka_semestra == forloop.counter0 %}
+            <option value={{forloop.counter0}} selected>{{forloop.counter0}}</option>
             {% else %}
-            <input type="checkbox" name="aktivna"/>
+            <option value={{forloop.counter0a}}>{{forloop.counter0}}</option>
             {% endif %}
-        </td>
-        </tr>
-        <tr>
-        <td>Za semestar:</td>
-        <td><input type="number" name='za_semestar' cols="10" value = {{grupa.za_semestar_id}} required/></td>
-        </tr>
-        <tr>
-        <td>Pobrisati postojece predmete:</td>
-        <td><input type="checkbox" name="reset"/></td>
-        </tr>
-        <tr>
-        <td>Predmeti</td>
-        <td>
-            <select name="predmeti" multiple>
-                {% for predmet in predmeti %}
-                <option value={{predmet.id}}>{{predmet.naziv}}</option>
-                {% endfor %}
-            </select>
-        </td>
-        </tr>
-        </tbody>
-        </table>
+            {% endfor %}
+        </select>
+        <br>
+        <label>Kapacitet</label>
+        <br>
+        <input type="number" rows="1" cols="10" name="kapacitet" value={{grupa.kapacitet}} required/>
+        <br>
+        <label>Smer:</label>
+        <br>
+        <select name="smer" required>
+            {% if grupa.smer == "RN" %}
+            <option value="RN" selected>RN</option>
+            {% else %}
+            <option value="RN">RN</option>
+            {% endif %}
+            {% if grupa.smer == "RM" %}
+            <option value="RM" selected>RM</option>
+            {% else %}
+            <option value="RM">RM</option>
+            {% endif %}
+        </select>
+        <br>
+        <label>Aktivna:</label>
+        <br>
+        {% if grupa.aktivna %}
+        <input type="checkbox" name="aktivna" checked/>
+        {% else %}
+        <input type="checkbox" name="aktivna"/>
+        {% endif %}
+        <br>
+        <label>Za semestar:</label>
+        <br>
+        <input type="number" name='za_semestar' cols="10" value = {{grupa.za_semestar_id}} required/>
+        <br>
+        <label>Pobrisati postojece predmete:</label>
+        <br>
+        <input type="checkbox" name="reset"/>
+        <br>
+        <label>Predmeti:</label>
+        <br>
+        <select name="predmeti" multiple>
+            {% for predmet in predmeti %}
+            <option value={{predmet.id}}>{{predmet.naziv}}</option>
+            {% endfor %}
+        </select>
         <br>
         <input type="submit" value="Snimi">
     </form>
+    </div>
+    </div>
 </body>
 </html>

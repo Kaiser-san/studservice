@@ -7,122 +7,104 @@
     <title>Izbor grupe ({{username}})</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-    <style type="text/css" media="screen">
-    * {
-    	padding : 3px;
-    }
-    	.right {
-    		background-color: cyan;
-    	}
 
-    	#forma {
-    	}
-		
-		h1 {
-		}
-
-    </style>
+	{% load static %}
+	<link href="{% static formStyle.css %}formStyle.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 
-	<div class="container">
-		<div class="row">
-			<h1> Izbor grupe </h1>
-		</div>
+    <div id="main">
+    <div id="first">
+		<h1> Izbor grupe </h1>
 		<form action="{% url 'izaberiGrupu' %}" method="post" id="forma">
 		{% csrf_token %}
-		<div class="row">
-			<div class="col-3 right">
-				Indeks
-			</div>
-			<div class="col-3">
-				<select name="oznaka_semestra" required>
-		    			{% for smer in smerovi %}
-		    			<option value='{{smer}}' {% if student.smer == '{{smer}}' %} selected {% endif %}>{{smer}}</option>
-		    			{% endfor %}
-		            </select>
-		            <input type="text" rows="1" cols="5" name="broj_indeksa" size="3" value='{{ student.broj_indeksa }}' required />
-		            /
-		            <select name="godina_upisa" required>
-		            	{% for godina in godine_upisa %}
-						<option value="{{godina}}" {% if student.godina_upisa == '{{godina}}' %} selected {% endif %}>{{godina}}</option>
-		            	{% endfor %}
-		            </select>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-3 right"> Ime </div>
-			<div class="col-3"> <input type="text" rows="1" cols="20" name="ime" value = '{{ student.ime }}' required /> </div>
-		</div>
-		<div class="row">
-			<div class="col-3 right"> Prezime </div>
-			<div class="col-3"> <input type="text" rows="1" cols="20" name="prezime" value = '{{ student.prezime }}' required /> </div>
-		</div>
-		<div class="row"> 
-			<div class="col-3 right"> Broj do sada ukupno ostvarenih ESPB </div>
-			<div class="col-3"> <input type="text" rows="1" cols="5" name="broj_ostvarenih_ESPB" size="3" required /> </div>
-		</div>
-		<div class="row"> 
-			<div class="col-3 right"> Skolske {{skolska_godina_pocetak}}/{{skolska_godina_kraj}} godine upisujem ESPB </div>
-			<div class="col-3"> <input type="text" rows="1" cols="5" name="broj_ESPB_upisanih" size="3" required /> </div>
-		</div>
-		<div class="row">
-			<div class="col-3 right"> Broj do sada polozenih ispita </div>
-			<div class="col-3"> <input type="text" rows="1" cols="5" name="broj_polozenih_ispita" size="3" required /> </div>
-		</div>
-		<div class="row">
-			<div class="col-3 right"> Semestar </div>
-			<div class="col-3">
+			<label>Smer:</label>
+			<br>
+			<select name="oznaka_semestra" required>
+				{% for smer in smerovi %}
+				<option value='{{smer}}' {% if student.smer == '{{smer}}' %} selected {% endif %}>{{smer}}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>Broj indeksa:</label>
+			<br>
+			<input type="text" rows="1" cols="5" name="broj_indeksa" size="3" value='{{ student.broj_indeksa }}' required />
+			<br>
+			<label>Godina:</label>
+			<br>
+			<select name="godina_upisa" required>
+				{% for godina in godine_upisa %}
+				<option value="{{godina}}" {% if student.godina_upisa == '{{godina}}' %} selected {% endif %}>{{godina}}</option>
+				{% endfor %}
+			</select>
+			<br>
+			<label>Ime:</label>
+			<br>
+			<input type="text" rows="1" cols="20" name="ime" value = '{{ student.ime }}' required />
+			<br>
+			<label>Prezime:</label>
+			<br>
+			<input type="text" rows="1" cols="20" name="prezime" value = '{{ student.prezime }}' required />
+			<br>
+			<label>Broj do sada ukupno ostvarenih ESPB:</label>
+			<br>
+			<input type="text" rows="1" cols="5" name="broj_ostvarenih_ESPB" size="3" required />
+			<br>
+			<label>Skolske {{skolska_godina_pocetak}}/{{skolska_godina_kraj}} godine upisujem ESPB:</label>
+			<br>
+			<input type="text" rows="1" cols="5" name="broj_ESPB_upisanih" size="3" required />
+			<br>
+			<label>Broj do sada polozenih ispita:</label>
+			<br>
+			<input type="text" rows="1" cols="5" name="broj_polozenih_ispita" size="3" required />
+			<br>
+			<label>Semestar:</label>
+			<br>
+			<div>
 			{% for sm in semestri %}
     			<input type="radio" name="semestar" value='{{sm}}'> {{sm}} </input>
 			{% endfor %}
-	   		</div> 
-		</div>
-		<div class="row">
-			<div class="col-3 right"> Prvi put upisuje semestar </div>
-			<div class="col-3">
+	   		</div>
+			<br>
+			<label> Prvi put upisuje semestar: </label>
+			<br>
+			<div>
 				<input type="radio" name="prvi_put_upisuje" value="Da" required> Da </input>
     			<input type="radio" name="prvi_put_upisuje" value="Ne"required> Ne </input> 
-	    	</div>	  
-		</div>
-		<div class="row">
-			<div class="col-3 right"> Grupa koju student bira </div>
-			<div class="col-3"> 
+	    	</div>
+			<br>
+			<label>Grupa koju student bira:</label>
+			<br>
+			<div>
 				{% for grupa in grupe %}
 	    			<input type="radio" name="izbor_grupe" value="{{grupa.id}}">{{grupa.oznaka_grupe}}</input>
     			{% endfor %}
-    		</div>		
-		</div>
-		<div class="row">
-				<div class="col-3 right align-middle "> Nepolozeni predmeti iz predhodnih godina </div>
-				<div class="col-3">
-					<select id="predmeti_input" style="width: 400px" multiple>
-	                	{% for predmet in predmeti %}
-	                	<option value={{predmet.id}}>{{predmet.naziv}}</option>
-	                	{% endfor %}
-	            	</select>
-					<button id="add_predmet" type="button"> V </button>
-					<button id="remove_predmet" type="button"> ^ </button>
-	            	<select name="predmeti" id="predmeti_output" style="width: 400px	;" multiple>
-	            	</select>
-	            </div>
-		</div>
-		<div class="row">
-			<div class="col-3 right"> Nacin placanje skolarine </div>
-			<div class="col-3"> 
+    		</div>
+			<br>
+			<label>Nepolozeni predmeti iz predhodnih godina:</label>
+			<br>
+			<select id="predmeti_input" style="width: 280px; height: 140px;" multiple>
+				{% for predmet in predmeti %}
+				<option value={{predmet.id}}>{{predmet.naziv}}</option>
+				{% endfor %}
+			</select>
+			<button id="add_predmet" type="button"> > </button>
+			<button id="remove_predmet" type="button"> < </button>
+			<select name="predmeti" id="predmeti_output" style="width: 280px; height: 140px;" multiple>
+			</select>
+			<br>
+			<label>Nacin placanje skolarine:</label>
+			<br>
+			<div>
 				<input type="radio" name="nacin_placanja" value="odjednom"> Odjednom </input>
 	    		<input type="radio" name="nacin_placanja" value="na_rate"> Na rate </input>
 	    		<input type="radio" name="nacin_placanja" value="stipendista"> Stipendista </input>
 	    	</div>
-		</div>
-		<div class="row">
-			<div class="col-3"></div>
-			<div class="col-3">
-				<input type="submit" value="Sacuvaj">
-			</div>
-		</div>
+			<br>
+		<input type="submit" value="Sacuvaj">
 		</form>
-	</div>
+    </div>
+    </div>
 
 	<script>
 		$(document).ready(function() {
