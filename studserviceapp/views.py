@@ -93,6 +93,13 @@ def izborgrupe(request,username):
     if(IzborGrupe.objects.filter(student=student).exists()):
         return HttpResponse("Vec ste izabrali grupu.")
 
+    grupeSemestar = {}
+    for semestar in range(1, 9):
+        grupeSemestar[semestar] = []
+        for grupa in IzbornaGrupa.objects.all():
+            if grupa.oznaka_semestra == semestar:
+                grupeSemestar[semestar].append(grupa.oznaka_grupe)
+
     curr_semestar = Semestar.objects.order_by('-pk')[0]
     neparni_semsetar = (curr_semestar.vrsta == 'neparni')
 
@@ -123,12 +130,21 @@ def izborgrupe(request,username):
                 'skolska_godina_kraj' : skolska_godina_kraj ,
                 'semestri' : semestri ,
                 'grupe' : izborne_grupe,
-                'linkovi' : get_linkovi(username)}
+                'linkovi' : get_linkovi(username),
+                'grupeSemestar': json.dumps(grupeSemestar)
+                }
     return render(request,'studserviceapp/izborGrupe.html',context)
 
 def changeGroup(request,grupa):
+    predmetiSemestar = {}
+    for semestar in range(1, 9):
+        predmetiSemestar[semestar] = []
+        for predmet in Predmet.objects.all():
+            if (predmet.semestar_po_programu == semestar):
+                predmetiSemestar[semestar].append(predmet.naziv)
     context = {'grupa' : IzbornaGrupa.objects.get(oznaka_grupe=grupa),
-                'predmeti' : Predmet.objects.all()}
+                'predmeti' : Predmet.objects.all(),
+               'predmetiSemestar': json.dumps(predmetiSemestar)}
     return render(request,'studserviceapp/changeGroup.html',context)
 
 def changedGroup(request):
@@ -226,6 +242,7 @@ def predajeStudentima(request, username):
 def izbornaGrupaList(request, group):
     studenti = {}
     for student in Student.objects.all():
+        studentKey = student.ime + ' ' + student.prezime + ' ' + student.smer + ' ' + str(student.broj_indeksa)+'/'+str(student.godina_upisa)
         try:
             izborGrupe = IzborGrupe.objects.get(student=student)
         except IzborGrupe.DoesNotExist:
@@ -233,9 +250,9 @@ def izbornaGrupaList(request, group):
         izbornaGrupa = IzbornaGrupa.objects.get(oznaka_grupe=izborGrupe.izabrana_grupa.oznaka_grupe)
         if(izbornaGrupa.oznaka_grupe==group):
             if student.slika and hasattr(student.slika, 'url'):
-                studenti[student.ime] = student.slika.url
+                studenti[studentKey] = student.slika.url
             else:
-                studenti[student.ime] = ''
+                studenti[studentKey] = ''
     context = {'oznaka_grupe' : group, 'studenti' : studenti}
     return render(request, "studserviceapp/izbornaGrupaList.html", context)
 
@@ -492,7 +509,7 @@ def home(request, username):
     ucionice.sort()
 
     obavestenja = []
-    for obavestenje in Obavestenje.objects.order_by('datum_postavljanja')[0:5]:
+    for obavestenje in Obavestenje.objects.order_by('datum_postavljanja').reverse()[0:5]:
         fajl = ''
         if obavestenje.fajl.name:
             fajl = obavestenje.fajl.url
@@ -558,10 +575,11 @@ import datetime
 def unesiObavestenje(request):
 
     obavestenje = Obavestenje(datum_postavljanja=datetime.datetime.now(), tekst=request.POST['tekst'], postavio_id=request.POST['nalog'])
-    fajl = request.FILES['fajl']
-    fs = FileSystemStorage()
-    filename = fs.save(fajl.name, fajl)
-    obavestenje.fajl = fs.url(filename)
+    if 'fajl' in request.FILES:
+        fajl = request.FILES['fajl']
+        fs = FileSystemStorage()
+        filename = fs.save(fajl.name, fajl)
+        obavestenje.fajl = fs.url(filename)
     obavestenje.save()
     return HttpResponse("Uspesno dodato obavestenje")
 

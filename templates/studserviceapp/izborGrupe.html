@@ -60,11 +60,12 @@
 			<br>
 			<label>Semestar:</label>
 			<br>
-			<div>
-			{% for sm in semestri %}
-    			<input type="radio" name="semestar" value='{{sm}}'> {{sm}} </input>
-			{% endfor %}
-	   		</div>
+			<select name="oznaka_semestra" required onchange="promenaSemestra(this)">
+				<option id="prviSemestar" value="1" selected>1</option>
+				<option value="3">3</option>
+				<option value="5">5</option>
+				<option value="7">7</option>
+        	</select>
 			<br>
 			<label> Prvi put upisuje semestar: </label>
 			<br>
@@ -75,11 +76,11 @@
 			<br>
 			<label>Grupa koju student bira:</label>
 			<br>
-			<div>
+			<select id="grupe" name="izbor_grupe" required>
 				{% for grupa in grupe %}
-	    			<input type="radio" name="izbor_grupe" value="{{grupa.id}}">{{grupa.oznaka_grupe}}</input>
-    			{% endfor %}
-    		</div>
+					<option value={{grupa.id}}>{{grupa.oznaka_grupe}}</option>
+				{% endfor %}
+        	</select>
 			<br>
 			<label>Nepolozeni predmeti iz predhodnih godina:</label>
 			<br>
@@ -105,8 +106,7 @@
 		</form>
     </div>
     </div>
-
-	<script>
+    <script type='text/javascript'>
 		$(document).ready(function() {
 			$("#add_predmet").click(function() {
 				let predmeti = $("#predmeti_input option:selected");
@@ -124,7 +124,21 @@
 				 $('#predmeti_output option').attr('selected', 'selected');
 				 return true;
 			});
-		})
+			promenaSemestra($('#prviSemestar')[0]);
+		});
+
+		function promenaSemestra(sel){
+            var grupeSemestar = {{grupeSemestar|safe}};
+            var grupeSet = new Set(grupeSemestar[sel.value]);
+            for (i = 0; i <= $('#grupe')[0].options.length; ++i) {
+                if (grupeSet.has($('#grupe')[0].options[i].text)) {
+                    $('#grupe option[value='+$('#grupe')[0].options[i].value+']').show();
+                }
+                else {
+                    $('#grupe option[value='+$('#grupe')[0].options[i].value+']').hide();
+                }
+            }
+		};
 	</script>	
 </body>
 </html>

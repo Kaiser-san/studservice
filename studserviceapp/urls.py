@@ -19,7 +19,6 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('timetable/<str:username>', views.timetableforuser, name='timetable'),
     path('izborgrupe/<str:username>', views.izborgrupe , name='izborgrupe'),
     path('mail/<str:username>', views.sendMail , name='mail'),
     path('changeGroup/<str:grupa>', views.changeGroup, name='changeGroup'),

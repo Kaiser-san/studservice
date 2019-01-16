@@ -11,6 +11,10 @@
 <body>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type='text/javascript'>
+        $(document).ready(function() {
+            promenaSemestra($('#prviSemestar')[0]);
+        });
+
         function promenaSemestra(sel){
             var predmetiSemestar = {{predmetiSemestar|safe}};
             var predmetiSet = new Set(predmetiSemestar[sel.value]);
@@ -35,7 +39,7 @@
         <label>Semestar:</label>
         <br>
             <select name="oznaka_semestra" required onchange="promenaSemestra(this)">
-                <option value="1">1</option>
+                <option id="prviSemestar" value="1" selected>1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
@@ -66,11 +70,11 @@
         <br>
         <label>Predmeti:</label>
         <br>
-            <select id="predmeti" name="predmeti" multiple required>
-                {% for predmet in predmeti %}
-                <option value={{predmet.id}}>{{predmet.naziv}}</option>
-                {% endfor %}
-            </select>
+        <select id="predmeti" name="predmeti" multiple required>
+            {% for predmet in predmeti %}
+            <option value={{predmet.id}}>{{predmet.naziv}}</option>
+            {% endfor %}
+        </select>
         <br>
         <input type="submit" value="Snimi">
     </form>
