@@ -20,7 +20,7 @@
 		{% csrf_token %}
 			<label>Smer:</label>
 			<br>
-			<select name="oznaka_semestra" required>
+			<select name="smer" required>
 				{% for smer in smerovi %}
 				<option value='{{smer}}' {% if student.smer == '{{smer}}' %} selected {% endif %}>{{smer}}</option>
 				{% endfor %}

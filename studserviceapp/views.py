@@ -41,14 +41,14 @@ def addGroup(request):
 
 def izaberiGrupu(request):
     izabrana_grupa = IzbornaGrupa.objects.get(id=request.POST['izbor_grupe'])
-    student = Student.objects.get(smer=request.POST['oznaka_semestra'],
+    student = Student.objects.get(smer=request.POST['smer'],
         broj_indeksa=request.POST['broj_indeksa'],
         godina_upisa=int(request.POST['godina_upisa']))
     izbor_grupe = IzborGrupe.objects.create(
         ostvarenoESPB=int(request.POST['broj_ostvarenih_ESPB']),
         upisujeESPB=int(request.POST['broj_ESPB_upisanih']),
         broj_polozenih_ispita=int(request.POST['broj_polozenih_ispita']),
-        upisuje_semestar=int(request.POST['semestar']),
+        upisuje_semestar=int(request.POST['oznaka_semestra']),
         prvi_put_upisuje_semestar=(request.POST['prvi_put_upisuje']=='Da'),
         nacin_placanja = request.POST['nacin_placanja'],
         student = student ,
@@ -234,8 +234,9 @@ def izbornaGrupaList(request, group):
     return render(request, "studserviceapp/izbornaGrupaList.html", context)
 
 def submitRasporedPolaganja(request, username):
-    context = { 'linkovi' : get_linkovi(username)}
-    return render(request,'studserviceapp/submitRasporedPolaganja.html', context)
+    if(username == 'submit'):
+        return do_submitRasporedPolaganja(request)
+    return render(request,'studserviceapp/submitRasporedPolaganja.html')
 
 def do_submitRasporedPolaganja(request):
     if 'dokument' in request.FILES:
